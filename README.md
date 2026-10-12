@@ -1,5 +1,22 @@
 # BIPZILLAWORLD 🎨
 
+## Kathmandu temple-square rebuild (current)
+
+The main museum scene has been rebuilt around a **compact 3D Kathmandu-inspired courtyard**, with:
+- Three multi-tier pagoda temples made from sloping roof meshes, timber eaves and masonry bases
+- Procedurally textured brick, roof shingles, wood and stone (generated locally in the browser; no large external texture downloads)
+- Traditional-looking houses, a stupa with prayer flags, distant mountain terrain and a lakeside area
+- Artwork on inspectable standing frames, using the existing `artworks.json` catalogue
+- WASD / arrow-key movement, drag-to-look, click-to-inspect and location buttons
+- A simple collision radius around main temples and stupa
+
+**Honest quality note:** This is still a stylised procedural approximation of Nepalese architecture. It is more detailed than the original corridor scene, but true semi-realistic/photoreal quality would require professionally modelled GLB assets, detailed PBR textures, and in-browser performance testing. There is no guarantee of smooth frame rates on every device.
+
+**Deployment:** Streamlit continues to render `index.html` through `app.py`. The private artist dashboard at `?admin=1` is preserved, and its GitHub token/password must be configured in Streamlit secrets before uploading art.
+
+---
+
+
 An ever-expanding immersive art museum — **colourful, expressive, contemporary**, built around BIPZILLA's work instead of a fantasy-game aesthetic.
 
 ## What is live in the code
