@@ -26,9 +26,9 @@ streamlit run app.py
 ```
 
 ## Add original artwork
-The existing `artworks.json` includes 19 catalogue positions but **the image files must still be added to GitHub**. Missing images render vivid illustrative placeholders, not broken image icons.
+The museum currently contains **12 original temporary Nepal-inspired SVG artworks** in `art/temp-01.svg` through `art/temp-12.svg`. These load immediately and are designed to be replaced with your real artworks later. Missing images still fall back to colourful illustrations.
 
-Upload `art/01.jpg` through `art/19.jpg` to match existing catalogue paths. Update metadata in `artworks.json` with real titles, descriptions and optionally a collection. Only upload art you own or have permission to exhibit.
+To replace temporary art, upload your own JPG/PNG/WEBP image to the `art/` folder, then edit the corresponding `image` path and title in `artworks.json`. For example, change `"image": "art/temp-01.svg"` to `"image": "art/my-painting.jpg"`. The original temporary SVG can be kept or deleted. Alternatively, use the private artist studio to add new works without editing code. Only upload art you own or have permission to exhibit.
 
 ## Private artist dashboard — persistent uploads
 The dashboard is available at `https://YOUR-APP.streamlit.app/?admin=1`. It is **not enabled until you configure both secrets**. In your Streamlit Community Cloud app, visit **Settings → Secrets** and add:
@@ -53,4 +53,4 @@ For a larger collection, replace embedded base64 artwork with dedicated image st
 - Explore button: quickly jump to the following room
 
 ## Design direction
-Warm white architecture, vivid coral, turquoise, lilac, yellow and blue rooms, spotlighted frames, energetic graphic typography and art-first storytelling. The eventual goal is to create curated architectural variations based on each series, not procedurally repeat the same walls forever.
+Nepal-inspired open-air architecture with Kathmandu courtyard colours, Pokhara lakeside turquoise, Himalayan mountain silhouettes, warm brick tones, and a daytime gallery environment. Temporary artworks are original geometric illustrations, not photographs of real locations. Performance improvements include a reduced pixel ratio, fewer room meshes kept active, and removal of per-artwork point lights. The eventual goal is to create curated architectural variations based on each series, not procedurally repeat the same walls forever.
