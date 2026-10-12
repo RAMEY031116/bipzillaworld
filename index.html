@@ -41,33 +41,53 @@ canvas{display:block;outline:0}button{font:inherit;cursor:pointer}
 #fallback .cards img{width:100%;aspect-ratio:3/4;object-fit:cover}
 @media(max-width:700px){#mast{padding:13px}#mast .kicker{display:none}.logo{font-size:20px}#status{left:12px;top:55px;padding:9px}#tools{left:10px;right:10px;bottom:10px}.legend{display:none}#touch{display:flex;flex-direction:column}.toolbuttons button{padding:10px;font-size:10px}#artModal{padding:12px}.art-panel{display:block}.art-picture{min-height:200px}.art-picture img{max-height:46vh}.art-info{padding:22px}.splash-inner h1{font-size:67px}}
 </style></head><body>
-<div id="hud"><div id="mast"><div class="logo">bipzilla<em>world.</em></div><div class="kicker">A COLOURFUL WORLD OF ART · ALWAYS EXPANDING</div></div>
+<div id="hud"><div id="mast"><div class="logo">bipzilla<em>world.</em></div><div class="kicker">KATHMANDU · POKHARA · HIMALAYAN HILLS</div></div>
 <div id="status"><div class="kicker" id="floorText">FLOOR 01 · THE FIGURE</div><strong id="roomText">GALLERY 001 / ∞</strong></div>
 <div id="crosshair">+</div><div id="notice"></div>
-<div id="tools"><div class="legend"><b>EXPLORE BIPZILLAWORLD</b><br>WASD / arrows — walk · Drag — look around<br>Walk up the stairs · Click artworks · Scroll — zoom<br>Every fourth gallery connects to a new floor</div>
+<div id="tools"><div class="legend"><b>EXPLORE BIPZILLAWORLD</b><br>WASD / arrows — walk · Drag — look around<br>Follow the hill path · Click artworks · Scroll — zoom<br>Follow the outdoor art path into new hillside galleries</div>
 <div class="toolbuttons"><button id="reset">↺ RESTART</button><button id="help">? CONTROLS</button><button id="next">EXPLORE →</button></div></div>
 <div id="touch"><button data-move="forward">▲</button><div style="display:flex;gap:5px"><button data-move="left">◀</button><button data-move="backward">▼</button><button data-move="right">▶</button></div></div></div>
-<div id="splash"><div class="splash-inner"><div class="overline">AN IMMERSIVE ONLINE EXHIBITION</div><h1>BIPZILLA<br><em>WORLD.</em></h1><p>Not a game. Your own colourful art universe. Step into a gallery inspired by expressive characters, vivid palettes and sketchbook energy, then keep wandering.</p><button id="enter" class="primary">ENTER THE MUSEUM →</button><p style="font-size:11px">Best experienced on desktop · Runs in your browser</p></div></div>
+<div id="splash"><div class="splash-inner"><div class="overline">A WALK THROUGH ART · INSPIRED BY NEPAL</div><h1>BIPZILLA<br><em>WORLD.</em></h1><p>Explore a colourful open-air art trail inspired by Kathmandu courtyards, Pokhara lakeside and the Himalayan hills. Discover new artwork around every turn.</p><button id="enter" class="primary">ENTER THE MUSEUM →</button><p style="font-size:11px">Best experienced on desktop · Runs in your browser</p></div></div>
 <div id="artModal"><div class="art-panel"><div class="art-picture" id="artPicture"></div><div class="art-info"><div class="kicker">FROM THE BIPZILLAWORLD COLLECTION</div><h2 id="artTitle"></h2><p id="artDescription"></p><button id="closeArt">← BACK TO THE GALLERY</button></div></div></div>
 <div id="fallback"><div class="logo">bipzilla<em>world.</em></div><h2>Explore the art collection</h2><p>The interactive 3D engine couldn't load in this browser. Your exhibition is available below.</p><div class="cards" id="fallbackCards"></div></div>
 <script type="module">
 const catalog=__ART_DATA__;
 const themes=[
-{name:'THE FIGURE', wall:0xffd7c4,accent:0xea533d,floor:0xe7d3be,ink:'#ea533d'},
-{name:'INK & CHARACTER',wall:0xd6ecdf,accent:0x257f86,floor:0xd5d2c0,ink:'#257f86'},
-{name:'COLOUR STUDIES',wall:0xe2d8fa,accent:0x9c56b3,floor:0xe4cfb7,ink:'#9c56b3'},
-{name:'SKETCHBOOK',wall:0xffe7af,accent:0xed9d31,floor:0xe7d6c9,ink:'#ed9d31'},
-{name:'OTHER WORLDS',wall:0xc8e4f5,accent:0x3676b0,floor:0xd9d0c8,ink:'#3676b0'}
+{name:'KATHMANDU COURTYARD', wall:0xe9ae86,accent:0xa94f37,floor:0xd5bd9b,ink:'#a94f37'},
+{name:'POKHARA LAKESIDE',wall:0xa4d6cc,accent:0x287b8c,floor:0xd8cbac,ink:'#287b8c'},
+{name:'HIMALAYAN HILLS',wall:0xe6d3b4,accent:0x698973,floor:0xd2c9ad,ink:'#457258'},
+{name:'VALLEY SKETCHES',wall:0xf2c9a5,accent:0xa76375,floor:0xd8c7ad,ink:'#a76375'},
+{name:'MONSOON COLOURS',wall:0xbddce2,accent:0x477b9e,floor:0xd5c9a5,ink:'#477b9e'}
 ];
 const placeholder=(i)=>{const colors=['#e85443','#2a8b8c','#a05db9','#edab45','#338ec0'];let c=colors[i%colors.length];let svg='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="780" viewBox="0 0 600 780"><rect width="600" height="780" fill="'+c+'"/><circle cx="310" cy="280" r="200" fill="#fff0bc"/><path d="M80 650Q220 120 410 480T600 400" fill="none" stroke="#292522" stroke-width="36"/><circle cx="235" cy="250" r="33" fill="#282321"/><circle cx="390" cy="260" r="33" fill="#282321"/><path d="M215 405Q315 500 415 405" fill="none" stroke="#282321" stroke-width="19" stroke-linecap="round"/><text x="300" y="735" fill="#fff" font-family="sans-serif" font-size="38" font-weight="bold" text-anchor="middle">BIPZILLAWORLD</text></svg>';return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)};
 function missing3D(){document.getElementById('splash').style.display='none';document.getElementById('fallback').style.display='block';let cards=document.getElementById('fallbackCards');(catalog.length?catalog:Array.from({length:19},(_,i)=>({title:'Artwork '+(i+1)}))).forEach((a,i)=>{let item=document.createElement('div');let img=document.createElement('img');img.src=a.image||placeholder(i);let cap=document.createElement('div');cap.textContent=a.title||'Untitled';item.append(img,cap);cards.append(item)})}
 let THREE;try{THREE=await import('https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js')}catch(e){console.error(e);missing3D();throw e}
 let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});}catch(e){missing3D();throw e}
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setSize(window.innerWidth,window.innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.4;renderer.domElement.style.touchAction='none';document.body.insertBefore(renderer.domElement,document.getElementById('hud'));
-const scene=new THREE.Scene();scene.background=new THREE.Color(0xf8efe3);scene.fog=new THREE.FogExp2(0xf8efe3,.0085);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.15));renderer.setSize(window.innerWidth,window.innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.4;renderer.domElement.style.touchAction='none';document.body.insertBefore(renderer.domElement,document.getElementById('hud'));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xb8d7e6);scene.fog=new THREE.FogExp2(0xb8d7e6,.0035);
+
+/* Lightweight painted Himalayan skyline: static, shared geometry and no textures. */
+const skyline=new THREE.Group();scene.add(skyline);
+function mountain(x,z,width,height,color){
+ const geo=new THREE.BufferGeometry();
+ const verts=new Float32Array([x-width/2,-5,z, x, height,z, x+width/2,-5,z]);
+ geo.setAttribute('position',new THREE.BufferAttribute(verts,3));
+ geo.computeVertexNormals();
+ const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide,depthWrite:false}));
+ mesh.renderOrder=-2;skyline.add(mesh);
+}
+for(let i=0;i<18;i++){
+ const x=(i-9)*24;
+ const h=12+((i*37)%23);
+ mountain(x,-102-(i%3)*3,46,h, i%2?0x95acbb:0xaabfc9);
+ mountain(x+6,-115-(i%4)*2,33,h+11,i%3?0xe3e5e0:0xf2eae0);
+}
+const groundPlane=new THREE.Mesh(new THREE.PlaneGeometry(190,650),new THREE.MeshBasicMaterial({color:0x879d79}));
+groundPlane.rotation.x=-Math.PI/2;groundPlane.position.set(0,-.50,-255);scene.add(groundPlane);
+
 const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.07,170);camera.position.set(0,1.72,5);
-scene.add(new THREE.HemisphereLight(0xfff9ed,0xb3ada8,2));
-const sun=new THREE.DirectionalLight(0xfff2da,2.7);sun.position.set(4,14,-12);scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xf9f1dc,0x9a9078,2.3));
+const sun=new THREE.DirectionalLight(0xfff4d8,2.0);sun.position.set(4,14,-12);scene.add(sun);
 const cubeGeometry=new THREE.BoxGeometry(1,1,1);
 const material=(color,rough=.82)=>new THREE.MeshStandardMaterial({color,roughness:rough});
 const clean=material(0xf8f5ef),dark=material(0x302b28),frameMat=material(0xd6ab71,.49),pillar=material(0xfcf1df);
@@ -90,12 +110,11 @@ piece(group,-2.65,tier+height+0.12,z,.12,.20,.96,accent);piece(group,2.65,tier+h
 piece(group,0,tier+3.5-.15,-8.3,5.3,.3,3.4,ground)
 }
 const wallH=8;
-for(const side of [-1,1]){piece(group,side*6.5,tier+4,0,.3,8,length,walls);
-for(const z of [-7.5,-2.5,2.5,7.5]){piece(group,side*6.29,tier+3.6,z,.12,7.1,.18,accent)}
+for(const side of [-1,1]){piece(group,side*6.5,tier+2.65,0,.3,5.3,length,walls);
+for(const z of [-7.5,0,7.5]){piece(group,side*6.29,tier+2.9,z,.12,4.4,.18,accent)}
 }
-piece(group,0,tier+8.1,0,13,.27,length,clean);
-for(const z of [-8,0,8]){piece(group,0,tier+7.94,z,12.5,.12,.14,accent);
-const lamp=new THREE.PointLight(0xffecd2,25,16,2);lamp.position.set(0,tier+7,z);group.add(lamp)}
+/* Open-air galleries: no roof, revealing the sky and Himalayan backdrop. */
+/* Daylight only: drastically fewer dynamic lights. */
 const isFirst=n===0;
 if(isFirst){piece(group,0,tier+4,9.8,13,8,.25,walls)}
 for(const side of [-1,1]){piece(group,side*4.45,tier+3.9,-9.81,4.15,7.8,.25,walls);
@@ -109,10 +128,10 @@ if(!isStair)for(let k=0;k<8;k++){const side=k%2?-1:1,z=7-Math.floor(k/2)*4.4;con
 piece(group,side*6.25,tier+3.9,z,.19,h+.3,w+.28,frameMat);
 const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide}));p.position.set(side*6.11,tier+3.9,z);p.rotation.y=side===1?-Math.PI/2:Math.PI/2;p.userData={art:a,num};group.add(p);pickables.push(p);
 const texURL=a.image||placeholder(num);const tex=new THREE.TextureLoader().load(texURL,()=>{},undefined,()=>{});tex.colorSpace=THREE.SRGBColorSpace;p.material.map=tex;p.material.needsUpdate=true;
-const light=new THREE.PointLight(0xffe2be,9,6,2);light.position.set(side*4.8,tier+5.5,z);group.add(light)}
+/* Sunlight illuminates each artwork without costly point lights. */}
 else{const banner=new THREE.Mesh(new THREE.PlaneGeometry(4.1,2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture((()=>{const c=document.createElement('canvas');c.width=512;c.height=256;const t=c.getContext('2d');t.fillStyle='#fff4e1';t.fillRect(0,0,512,256);t.fillStyle='#332923';t.textAlign='center';t.font='bold 40px sans-serif';t.fillText('NEXT FLOOR ↑',256,120);t.font='24px sans-serif';t.fillText('FOLLOW THE STAIRS',256,165);return c})()),side:THREE.DoubleSide}));banner.position.set(0,tier+5,-4);banner.rotation.y=Math.PI;group.add(banner)}
 }
-function ensure(n){for(let i=Math.max(0,n-2);i<=n+3;i++)generate(i);for(const [j,g] of floors){if(Math.abs(n-j)>4){scene.remove(g);floors.delete(j);for(let k=pickables.length-1;k>=0;k--)if(pickables[k].parent===g){pickables[k].material.map?.dispose();pickables[k].material.dispose();pickables.splice(k,1)}}}}
+function ensure(n){for(let i=Math.max(0,n-1);i<=n+2;i++)generate(i);for(const [j,g] of floors){if(Math.abs(n-j)>3){scene.remove(g);floors.delete(j);for(let k=pickables.length-1;k>=0;k--)if(pickables[k].parent===g){pickables[k].material.map?.dispose();pickables[k].material.dispose();pickables.splice(k,1)}}}}
 function notify(s){const el=document.getElementById('notice');el.textContent=s;el.style.opacity=1;clearTimeout(notify.timer);notify.timer=setTimeout(()=>el.style.opacity=0,2500)}
 function openArtwork(mesh){if(!mesh)return;const a=mesh.userData.art;modal=true;document.getElementById('artPicture').innerHTML='';const img=document.createElement('img');img.src=a.image||placeholder(mesh.userData.num);img.alt=a.title||'Artwork';document.getElementById('artPicture').append(img);document.getElementById('artTitle').textContent=a.title||'Untitled artwork';document.getElementById('artDescription').textContent=a.description||'Part of the growing BIPZILLAWORLD art collection.';document.getElementById('artModal').style.display='flex'}
 function closeArt(){modal=false;document.getElementById('artModal').style.display='none'}
