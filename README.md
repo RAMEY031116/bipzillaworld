@@ -20,6 +20,16 @@ QA: JavaScript syntax and repository references checked. Live rendering, mobile 
 
 **Performance:** shadows disabled in the scene manifest; mobile panorama downsampled; static architectural instancing and FAST/BALANCED/DETAIL remain. This has passed source-level syntax checks only, **not a deployed browser render, FPS benchmark, or headset test**.
 
+### Scalable 52-frame exhibition and collection search — October 2026
+
+The orbital museum has **52 reusable physical exhibition frames** on desktop, distributed across the main hall, both side observatories and the planetary overlook. Mobile uses **30 active frames per exhibition page**, deliberately distributed across all areas to reduce GPU load. Every frame is reusable: **100, 300, or 1,000 artworks** are displayed across paginated exhibition rotations without creating 1,000 separate 3D frames. Use the exhibition page arrows to rotate the works on display, or the new title/number search to jump to a specific work and open its large inspection view.
+
+Artwork textures are **loaded only when a visitor approaches a gallery bay**, downscaled to 1,536 pixels on desktop or 1,024 on mobile for the physical 3D display, and disposed when switching pages. The full original remains available in the artwork modal. Frames share physically lit brushed-metal materials and micro-bump textures, warm lighting and individual title placards.
+
+New uploads published through the private Streamlit artist studio are served as individual CDN image URLs rather than base64-embedding every new file into the HTML iframe. The original 19-piece historical inline pack remains supported; migrating those legacy originals to individual files would further reduce initial download size. The private dashboard and 19-artwork collection are preserved.
+
+**QA:** JavaScript syntax checked and the upload/dashboard implementation preserved. A real-browser rendering and mobile-performance pass is still required before claiming production-level performance.
+
 ### Detail-only planetary and botanical polish — October 2026
 
 The museum's quality control is **locked to DETAIL**, with no automatic fallback to Balanced or Fast. To avoid returning to the earlier lag, rendering still caps device pixel ratio at 1.5 and disables expensive shadow-map effects when configured off. Detail mode means the detailed scene stays enabled, not an unlimited GPU workload.
