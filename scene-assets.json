@@ -1,7 +1,46 @@
 {
-  "version": 1,
-  "notes": "Add optimized GLB files to assets/models and put their paths below. Existing procedural architecture remains visible until each model loads successfully. Positions use world units.",
+  "version": 2,
+  "notes": "Phase 1: arrival gate, hero pagoda, terraces, cliff and courtyard. Models are optional until actual licensed GLB files exist. Do not mark this as visually finished before screenshot review.",
   "models": [
+    {
+      "id": "arrival-gate",
+      "file": "",
+      "replaces": "arrival-gate",
+      "position": [
+        0,
+        0,
+        42
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
+    {
+      "id": "terrain-cliff",
+      "file": "",
+      "replaces": "terrain-cliff",
+      "position": [
+        0,
+        0,
+        -26
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
+    {
+      "id": "museum-pavilion",
+      "file": "",
+      "replaces": "museum-pavilion",
+      "position": [
+        0,
+        0,
+        -56
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
     {
       "id": "main-pagoda",
       "file": "",
@@ -82,5 +121,30 @@
     "maxPixelRatio": 1.25,
     "shadowMapSize": 1024,
     "farView": 520
+  },
+  "phase": "phase-1-hero-courtyard",
+  "phase1": {
+    "spawn": [
+      0,
+      2.1,
+      70
+    ],
+    "heroTemple": [
+      0,
+      0,
+      -27
+    ],
+    "entrance": [
+      0,
+      0,
+      42
+    ],
+    "gallerySlots": 6,
+    "targets": {
+      "desktopFPS": 40,
+      "entryTimeSeconds": 3,
+      "quality": "first view must look architectural not blockout"
+    },
+    "status": "preparation-in-progress"
   }
 }
