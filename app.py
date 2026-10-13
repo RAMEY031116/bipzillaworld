@@ -56,6 +56,15 @@ def museum():
         p.parts and not p.is_absolute() and ".." not in p.parts
         and p.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp")
     ) else ""
+    # Restrict external backdrop sources to Wikimedia; model assets stay in GitHub.
+    from urllib.parse import urlparse
+    external = str(panorama.get("external_url", ""))
+    parsed = urlparse(external)
+    if not panorama["url"] and (
+        parsed.scheme == "https" and
+        parsed.hostname in ("thumb.wikimedia.org", "upload.wikimedia.org")
+    ):
+        panorama["url"] = external
     html = html.replace("__SCENE_CONFIG__", json.dumps(config).replace("</", "<\\/"))
     return html.replace("__ART_DATA__", json.dumps(works).replace("</", "<\\/"))
 
