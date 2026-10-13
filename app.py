@@ -28,6 +28,8 @@ def settings(name):
 @st.cache_data(show_spinner=False)
 def museum():
     raw = json.loads((ROOT / "artworks.json").read_text(encoding="utf-8"))
+    originals_path = ROOT / "art" / "originals.json"
+    original_images = json.loads(originals_path.read_text(encoding="utf-8")) if originals_path.is_file() else {}
     works = []
     for item in raw:
         w = dict(item)
@@ -36,13 +38,20 @@ def museum():
         primary = Path(str(w.get("image", "")))
         fallback = Path(str(w.get("fallback_image", "")))
         w["image"] = ""
-        for p in (primary, fallback):
+        for p in (primary,):
             if p.parts and not p.is_absolute() and ".." not in p.parts:
                 target = ROOT / p
                 if target.is_file():
                     mime = mimetypes.guess_type(target.name)[0] or "image/jpeg"
                     w["image"] = "data:" + mime + ";base64," + base64.b64encode(target.read_bytes()).decode("ascii")
                     break
+        if not w["image"] and primary.as_posix() in original_images:
+            w["image"] = original_images[primary.as_posix()]
+        if not w["image"] and fallback.parts and not fallback.is_absolute() and ".." not in fallback.parts:
+            target = ROOT / fallback
+            if target.is_file():
+                mime = mimetypes.guess_type(target.name)[0] or "image/svg+xml"
+                w["image"] = "data:" + mime + ";base64," + base64.b64encode(target.read_bytes()).decode("ascii")
         works.append(w)
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     config = json.loads((ROOT / "scene-assets.json").read_text(encoding="utf-8"))
