@@ -66,7 +66,7 @@ function roof(g,y,width,depth,rise){
  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
  geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeVertexNormals();
  const roofMaterial=new T.MeshStandardMaterial({map:texture('roof'),color:0xb8aaa1,roughness:.91,side:T.DoubleSide});
- g.add(new T.Mesh(geo,roofMaterial));
+ const roofMesh=new T.Mesh(geo,roofMaterial);roofMesh.castShadow=true;roofMesh.receiveShadow=true;g.add(roofMesh);
  // Eaves, copper/wood ridge edges and diagonal supports
  for(const side of [-1,1]){
    box(g,side*width/2,y+.23,0,.16,.25,depth,M.wood);
