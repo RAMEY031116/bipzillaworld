@@ -1577,14 +1577,74 @@ if(!ORBITAL_MODE)loadExternalSceneAssets();
 const ray=new T.Raycaster();const keys={};let active=false,modal=false,dragging=false,yaw=0,pitch=0,downX=0,downY=0,last=performance.now(),zone=0;
 const spawns=[{x:0,z:-3,y:2.1,title:'Earth Observation Hall',area:'NEPAL ORBITAL MUSEUM',yaw:0},{x:-74,z:-35,y:2.1,title:'Nebula Gallery',area:'WEST OBSERVATORY',yaw:-1.1},{x:0,z:-119,y:2.1,title:'Planetary Overlook',area:'DEEP SPACE',yaw:0}];
 function notice(s){let t=$('toast');t.textContent=s;t.style.opacity=1;clearTimeout(notice.timer);notice.timer=setTimeout(()=>t.style.opacity=0,2300)}
-function teleport(i){zone=i;const p=spawns[i];camera.position.set(p.x,p.y,p.z);yaw=p.yaw;pitch=0;$('spot').textContent=p.title;$('area').textContent=p.area;document.querySelectorAll('[data-zone]').forEach((b,j)=>b.classList.toggle('active',i===j));notice(p.title)}
-function inspect(){ray.setFromCamera(new T.Vector2(0,0),camera);const hits=ray.intersectObjects(pickables);if(!hits.length||hits[0].distance>10)return;const a=hits[0].object.userData.art;$('title').textContent=a.title||'Artwork';$('description').textContent=a.description||'From the BIPZILLAWORLD art collection';$('photo').innerHTML='';const im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Artwork';$('photo').append(im);$('modal').style.display='flex';modal=true}
-function dismiss(){modal=false;$('modal').style.display='none'}
+function teleport(i){focusTransition=null;zone=i;const p=spawns[i];camera.position.set(p.x,p.y,p.z);yaw=p.yaw;pitch=0;$('spot').textContent=p.title;$('area').textContent=p.area;document.querySelectorAll('[data-zone]').forEach((b,j)=>b.classList.toggle('active',i===j));notice(p.title)}
+
+let selectedArtworkIndex=0,focusTransition=null;
+function showArtwork(index){
+ selectedArtworkIndex=(index+ART.length)%ART.length;
+ const a=ART[selectedArtworkIndex];
+ $('title').textContent=a.title||'Artwork';
+ $('description').textContent=a.description||'From the BIPZILLAWORLD art collection';
+ $('photo').innerHTML='';
+ const im=document.createElement('img');
+ im.src=a.image||a.fallback_image||'';
+ im.alt=a.title||'Artwork';im.loading='eager';
+ im.onerror=()=>{if(a.fallback_image&&!im.dataset.fallback){im.dataset.fallback='1';im.src=a.fallback_image}};
+ $('photo').append(im);
+ $('art-counter').textContent='ARTWORK '+(selectedArtworkIndex+1)+' / '+ART.length;
+ $('modal').style.display='flex';modal=true
+}
+function inspect(clientX,clientY){
+ const rect=renderer.domElement.getBoundingClientRect();
+ const mx=clientX==null?0:((clientX-rect.left)/rect.width)*2-1;
+ const my=clientY==null?0:-((clientY-rect.top)/rect.height)*2+1;
+ ray.setFromCamera(new T.Vector2(mx,my),camera);
+ const hits=ray.intersectObjects(pickables,false);
+ if(!hits.length||hits[0].distance>23)return false;
+ const mesh=hits[0].object,a=mesh.userData.art;
+ const index=ART.indexOf(a);if(index<0)return false;
+ mesh.updateWorldMatrix(true,false);
+ const target=mesh.getWorldPosition(new T.Vector3());
+ const facing=new T.Vector3(0,0,1).transformDirection(mesh.matrixWorld);
+ const destination=target.clone().addScaledVector(facing,6);
+ destination.y=2.1;
+ if(!walkable(destination.x,destination.z)){showArtwork(index);return true}
+ const dir=target.clone().sub(destination);
+ const endYaw=Math.atan2(-dir.x,-dir.z);
+ const endPitch=Math.atan2(dir.y,Math.hypot(dir.x,dir.z));
+ const shortest=((endYaw-yaw+Math.PI*3)%(Math.PI*2))-Math.PI;
+ focusTransition={start:performance.now(),duration:720,
+  from:camera.position.clone(),to:destination,
+  yawStart:yaw,yawDelta:shortest,pitchStart:pitch,pitchEnd:endPitch,index};
+ $('art-hint').classList.remove('visible');return true
+}
+function dismiss(){focusTransition=null;modal=false;$('modal').style.display='none'}
+$('art-prev').onclick=()=>showArtwork(selectedArtworkIndex-1);
+$('art-next').onclick=()=>showArtwork(selectedArtworkIndex+1);
+$('art-close-x').onclick=dismiss;
 $('enter').onclick=()=>{active=true;$('intro').style.display='none';notice('WELCOME TO BIPZILLA ORBITAL')};
 $('reset').onclick=()=>teleport(0);$('close').onclick=dismiss;$('modal').onclick=e=>{if(e.target.id==='modal')dismiss()};
 document.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>teleport(Number(b.dataset.zone)));
+
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&modal){dismiss();return}
+ if(!modal)return;
+ if(e.key==='ArrowLeft'){e.preventDefault();showArtwork(selectedArtworkIndex-1)}
+ if(e.key==='ArrowRight'){e.preventDefault();showArtwork(selectedArtworkIndex+1)}
+});
+let lastHintCheck=0;
+renderer.domElement.addEventListener('pointermove',e=>{
+ if(dragging||!active||modal||focusTransition||performance.now()-lastHintCheck<130)return;
+ lastHintCheck=performance.now();
+ const rect=renderer.domElement.getBoundingClientRect();
+ ray.setFromCamera(new T.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1),camera);
+ const hit=ray.intersectObjects(pickables,false)[0],close=hit&&hit.distance<23;
+ $('art-hint').textContent=close?'Tap to inspect artwork · full-size view':'';
+ $('art-hint').classList.toggle('visible',!!close);
+ renderer.domElement.style.cursor=close?'pointer':'grab'
+});
 renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;downX=e.clientX;downY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
-renderer.domElement.addEventListener('pointerup',e=>{if(Math.hypot(e.clientX-downX,e.clientY-downY)<5&&active&&!modal)inspect();dragging=false});
+renderer.domElement.addEventListener('pointerup',e=>{if(Math.hypot(e.clientX-downX,e.clientY-downY)<9&&active&&!modal)inspect(e.clientX,e.clientY);dragging=false});
 renderer.domElement.addEventListener('pointermove',e=>{if(!dragging||modal||!active)return;yaw-=e.movementX*.0034;pitch=T.MathUtils.clamp(pitch-e.movementY*.0034,-1.08,1.08)});
 // Touchscreen walking controls; the rest of the canvas remains drag-to-look.
 document.querySelectorAll('[data-walk]').forEach(button=>{
@@ -1655,6 +1715,7 @@ if(navigator.xr&&window.isSecureContext){
 function render(now){
  const dt=Math.max(0,Math.min((now-last)/1000,.06));last=now;
  const elapsed=now*.001;
+ if(focusTransition){const f=focusTransition,t=Math.min(1,(now-f.start)/f.duration),e=t*t*(3-2*t);camera.position.lerpVectors(f.from,f.to,e);yaw=f.yawStart+f.yawDelta*e;pitch=f.pitchStart+(f.pitchEnd-f.pitchStart)*e;camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;if(t>=1){focusTransition=null;showArtwork(f.index)}}
  // The distant photographic shell follows the visitor's location, but not
  // their rotation. This makes turning 360° reveal new directions.
  // Auto-lower resolution if sustained frame time exceeds the device budget.
@@ -1671,7 +1732,7 @@ function render(now){
  moonSurface.rotation.y+=dt*.003;ringSystem.rotation.z+=dt*.0007;
  core.rotation.y+=dt*.13;core.rotation.z=Math.sin(elapsed*.12)*.045;
  probe.rotation.y+=dt*.04;debris.rotation.y+=dt*.001;
- if(active&&!modal&&!renderer.xr.isPresenting){
+ if(active&&!modal&&!focusTransition&&!renderer.xr.isPresenting){
   const forward=Number(!!(keys.KeyW||keys.ArrowUp))-Number(!!(keys.KeyS||keys.ArrowDown));
   const strafe=Number(!!(keys.KeyD||keys.ArrowRight))-Number(!!(keys.KeyA||keys.ArrowLeft));
   // One normalized movement vector: diagonal walking is not faster,
