@@ -2,6 +2,14 @@
 
 **Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
 
+### Earth-window composition + Nepal in space — October 2026
+
+The default visitor spawn is now **inside the main observation hall**, looking directly through the panoramic window toward a **larger, repositioned Earth**. The large dome is now almost invisible glass rather than the earlier opaque blue layer, and the scene retains the sculpted curved window arches, marble and bronze interiors. A central viewing telescope and lounge seating help the hall feel inhabited.
+
+Two **double-pennant Nepal flags** are displayed inside the orbital station, with a bilingual **NEPAL · ORBITAL ART MUSEUM / नेपाल · पृथ्वी अवलोकन ग्यालरी** plaque. This preserves the Nepalese identity without replacing the requested space-station architecture with temples. The flag is generated as a local canvas texture so it requires no additional network download.
+
+**Performance preserved:** the architectural instancing, FAST/BALANCED/DETAIL switch, automatic resolution reduction, mobile star budget and shadow-lighting reductions from the prior optimization pass remain active. No live browser screenshot or frame-rate benchmark has been performed, so visual similarity to the concept image is a target, not a verified claim.
+
 ### Cinematic observatory rebuild + original artist collection — October 2026
 
 The active 3D world now has a **marble-finished observation hall** with physically based environment reflections, bronze-and-gunmetal architecture, panoramic window framing, curved ceiling ribs, an elevated balcony, glass rails, warm exhibition spotlights, indoor greenery, and a miniature Earth globe sculpture. The external Earth is larger in the main forward view. This is actual walkable Three.js geometry, **not a flat generated picture**. The generated concept image is a visual target rather than an in-world texture.
