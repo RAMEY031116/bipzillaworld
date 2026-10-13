@@ -2,6 +2,16 @@
 
 **Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
 
+### Interactive 360° orbital museum and original artworks — October 2026
+
+**Current implementation:** A real Three.js inward-facing panoramic sphere now surrounds the visitor. Unlike the former fixed CSS photo, the environment reveals different directions as the camera turns left, right, or behind; the 3D architecture, Nepal flags, exhibit globe, flooring and artwork stands remain actual walkable geometry. The sphere follows camera position (as a distant environment should), while the foreground moves with perspective. Vertical look is clamped to avoid camera roll or upside-down views. Touchscreen movement arrows and drag-to-look controls have been added. The user can switch to the procedural outer-space mode with the 360° panorama button.
+
+**Installed imagery:** `assets/orbital-360-panorama.b64` is now actually committed to GitHub (a WebP image stored as base64 text to accommodate GitHub's text-file connector). Streamlit reads and embeds it directly; standalone hosting loads it with `fetch()`. The 4096×2048 texture was assembled from **four different cinematic AI-generated space-museum views**, not one stationary photograph; mobile scales it to 2048×1024 to save GPU memory. This is a stitched visual approximation, **not a genuine 360° photographed environment**, so some directional seams and perspective distortions may be visible, especially at the poles. No photogrammetry or true depth data exists in the photo.
+
+**Original artist images installed:** `art/originals.json` now contains **all nineteen original user-supplied artwork images**, optimized as WebP data URIs. The Streamlit app and standalone viewer use these in preference to temporary placeholder images. The original source files were supplied by the user earlier in this conversation and remain preserved in the earlier original-art upload pack. The museum's private admin dashboard is preserved.
+
+**Performance:** shadows disabled in the scene manifest; mobile panorama downsampled; static architectural instancing and FAST/BALANCED/DETAIL remain. This has passed source-level syntax checks only, **not a deployed browser render, FPS benchmark, or headset test**.
+
 ### Cinematic image + live 3D hybrid (October 2026)
 
 The user requested that the website resemble the generated cinematic space-station reference rather than a simple mobile-game-like dome. **A new hybrid mode is implemented in `index.html` and `app.py`:** the panoramic cinematic image is used as a lightweight, fixed distant backdrop while the museum architecture, 19 artwork frames, Nepal flags, floor and walk controls remain real Three.js objects. A small look-based parallax offset gives the image a subtle response when the camera rotates. This is deliberately a **2D image background + genuine 3D foreground**, not a fully navigable 3D model of everything in the photograph.
