@@ -265,6 +265,52 @@ function courtyardDetails(){
  bell(-19,-15);bell(19,-15);
 }
 
+
+function arrivalGateway(){
+ // Temporary cinematic arrival threshold until a sculpted gate GLB is approved.
+ const g=new T.Group();g.position.set(0,0,42);scene.add(g);sceneFallback('arrival-gate',g);
+ for(const side of [-1,1]){
+  const x=side*7;
+  box(g,x,4.35,0,3.4,8.7,4.2,M.brick);
+  box(g,x,8.25,0,4.0,.30,4.8,M.stone);
+  box(g,x,1.8,2.22,3.7,.35,.32,M.stone);
+  for(let i=0;i<3;i++)box(g,x,3+i*1.42,2.16,2.3,.21,.18,M.wood);
+  pole(g,side*5.45,4.1,1.91,.25,7.7,M.wood,8);
+  pole(g,side*8.5,4.1,1.91,.25,7.7,M.wood,8);
+ }
+ box(g,0,8.4,0,15.0,1.1,4.7,M.wood);
+ box(g,0,9.35,0,16,.34,5.2,M.gold);
+ const lintel=new T.Mesh(new T.CylinderGeometry(2.85,2.85,4.8,20,1,false,0,Math.PI),M.wood);
+ lintel.rotation.x=Math.PI/2;lintel.position.set(0,8.2,0);lintel.castShadow=true;g.add(lintel);
+ // roof-like pitched cap, separate from the walkway so the camera has an open passage
+ roof(g,10.0,20.5,7.8,1.85);
+ const carvings=new T.InstancedMesh(UNIT,M.gold,36),mx=new T.Matrix4();
+ for(let i=0;i<36;i++){const x=-6.1+(i%18)*.72,y=8.18+Math.floor(i/18)*.42;
+  mx.compose(new T.Vector3(x,y,2.4),new T.Quaternion(),new T.Vector3(.24,.18,.12));carvings.setMatrixAt(i,mx)}
+ carvings.instanceMatrix.needsUpdate=true;g.add(carvings);
+ g.traverse(o=>{if(o.isMesh)o.castShadow=true});
+}
+function terraceLandscape(){
+ // Sculpted rocky verge at the boundary of the square, not walkable far terrain.
+ const g=new T.Group();scene.add(g);sceneFallback('terrain-cliff',g);
+ const rock=new T.MeshStandardMaterial({color:0xa09a8a,roughness:.97,map:texture('stone'),side:T.DoubleSide});
+ const rows=9,cols=45,positions=[],uvs=[],indices=[];
+ for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){
+  const t=i/cols,depth=j/rows,x=(t-.5)*130,z=-128+depth*27;
+  const ridge=(Math.sin(t*27.2)+Math.sin(t*58.7)*.27)*1.5;
+  const h=depth*9+ridge*(.15+.85*depth)-.9;
+  positions.push(x,h,z);uvs.push(t*10,depth*4)
+ }
+ for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=j*(cols+1)+i,b=a+1,c=a+cols+1,d=c+1;indices.push(a,b,c,b,d,c)}
+ const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();
+ const mesh=new T.Mesh(geo,rock);mesh.receiveShadow=true;g.add(mesh);
+ for(const z of [-108,-116]){box(g,0,1.2,z,102,2.5,.95,M.stone)}
+ // Small planted pockets at transitions; no endless lawns in the hero view.
+ for(let i=0;i<12;i++){const x=-46+i*8.1;if(Math.abs(x)<12)continue;
+  const b=new T.Mesh(new T.DodecahedronGeometry(.9+(i%3)*.21,0),rock);
+  b.position.set(x,.38,-107+(i%2)*2);b.rotation.set(i*.21,i*.47,i*.12);g.add(b)}
+}
+
 // A small curated world; no procedurally duplicated rooms or dozens of lights.
 plane(0,-75,410,390,M.grass,-.18);
 plane(0,-12,107,125,M.stone,.035);
@@ -283,6 +329,7 @@ const lake=new T.Mesh(new T.PlaneGeometry(125,125),M.water);lake.rotation.x=-Mat
 for(let n=0;n<3;n++)mountainRange(-260-n*37,n*1.82,19+n*23,22+n*20,[0x657e75,0x8fa4a4,0xbacace][n]);
 for(let i=0;i<22;i++){const x=-170+(i%8)*47,z=-155+Math.floor(i/8)*67;if(Math.abs(x)<77&&z>-116)continue;tree(x,z,6+(i%3)*1.7)}
 buildVegetation();courtyardDetails();
+arrivalGateway();terraceLandscape();
 const points=[[25,17,Math.PI],[-25,17,Math.PI],[29,-3,-Math.PI/2],[-29,-3,Math.PI/2],[-25,-99,0],[25,-99,0],[-49,-47,Math.PI/2],[49,-47,-Math.PI/2],[75,-123,-Math.PI/2],[100,-90,Math.PI],[0,-111,0],[-75,-42,Math.PI/2]];
 points.forEach((p,i)=>galleryBoard(...p,i));
 
@@ -335,7 +382,7 @@ async function loadExternalSceneAssets(){
 loadExternalSceneAssets();
 
 const ray=new T.Raycaster();const keys={};let active=false,modal=false,dragging=false,yaw=0,pitch=0,downX=0,downY=0,last=performance.now(),zone=0;
-const spawns=[{x:0,z:64,y:2.1,title:'Temple Square',area:'KATHMANDU VALLEY',yaw:0},{x:76,z:-95,y:2.1,title:'Stupa View',area:'HIMALAYAN HILLS',yaw:-.2},{x:-105,z:-54,y:2.1,title:'Lakeside Trail',area:'POKHARA INSPIRED',yaw:.55}];
+const spawns=[{x:0,z:70,y:2.1,title:'Arrival Gate',area:'KATHMANDU VALLEY',yaw:0},{x:76,z:-95,y:2.1,title:'Stupa View',area:'HIMALAYAN HILLS',yaw:-.2},{x:-105,z:-54,y:2.1,title:'Lakeside Trail',area:'POKHARA INSPIRED',yaw:.55}];
 function notice(s){let t=$('toast');t.textContent=s;t.style.opacity=1;clearTimeout(notice.timer);notice.timer=setTimeout(()=>t.style.opacity=0,2300)}
 function teleport(i){zone=i;const p=spawns[i];camera.position.set(p.x,p.y,p.z);yaw=p.yaw;pitch=0;$('spot').textContent=p.title;$('area').textContent=p.area;document.querySelectorAll('[data-zone]').forEach((b,j)=>b.classList.toggle('active',i===j));notice(p.title)}
 function inspect(){ray.setFromCamera(new T.Vector2(0,0),camera);const hits=ray.intersectObjects(pickables);if(!hits.length||hits[0].distance>10)return;const a=hits[0].object.userData.art;$('title').textContent=a.title||'Artwork';$('description').textContent=a.description||'From the BIPZILLAWORLD art collection';$('photo').innerHTML='';const im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Artwork';$('photo').append(im);$('modal').style.display='flex';modal=true}
