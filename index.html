@@ -88,15 +88,15 @@ let T;try{T=await import('three')}catch(err){console.error(err);showFallback('Th
 let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'})}catch(err){showFallback('This browser cannot display WebGL. Your artwork is still available.');throw err}
 const visualQuality=SCENE_ASSETS.quality||{};
 const isMobileDevice=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||innerWidth<800;
-const qualityLevels=[.65,.9,1.2];let qualityIndex=isMobileDevice?0:1;
+const qualityLevels=[1.5,1.5,1.5];let qualityIndex=2; // DETAIL is always on, including mobile.
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,qualityLevels[qualityIndex]));
 // High shadow-map cost was the main source of mobile stalls.
 renderer.shadowMap.enabled=visualQuality.shadows===true;
-renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;document.body.prepend(renderer.domElement);
+renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.13;document.body.prepend(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color(0xb5cddd);scene.fog=new T.Fog(0xb5cddd,170,510);
 const camera=new T.PerspectiveCamera(69,innerWidth/innerHeight,.08,650);
-const hemi=new T.HemisphereLight(0xfff0d9,0x74776c,2.15);scene.add(hemi);
-const sun=new T.DirectionalLight(0xffe2b8,2.05);sun.position.set(-65,105,50);
+const hemi=new T.HemisphereLight(0xdceaff,0x25364b,1.1);scene.add(hemi);
+const sun=new T.DirectionalLight(0xffe8c6,2.65);sun.position.set(-65,105,50);
 sun.castShadow=renderer.shadowMap.enabled;
 sun.shadow.mapSize.set(visualQuality.shadowMapSize||1024,visualQuality.shadowMapSize||1024);
 sun.shadow.camera.left=-88;sun.shadow.camera.right=88;
@@ -991,8 +991,8 @@ const moonTexture=surfaceTexture('rock',isMobileDevice?256:512,isMobileDevice?12
 
 // A large blue planetary horizon, visibly spherical with subtle clouds.
 const planet=new T.Group();planet.position.set(30,-29,-236);planet.rotation.z=.08;planet.scale.setScalar(1.36);scene.add(planet);
-const world=new T.Mesh(new T.SphereGeometry(94,96,64),new T.MeshStandardMaterial({map:oceanTexture,roughness:.86,metalness:0,emissive:0x061426,emissiveIntensity:.10}));planet.add(world);
-const cloudShell=new T.Mesh(new T.SphereGeometry(95.3,80,48),new T.MeshStandardMaterial({map:cloudTexture,transparent:true,opacity:.64,roughness:1,depthWrite:false,side:T.FrontSide}));
+const world=new T.Mesh(new T.SphereGeometry(94,128,96),new T.MeshStandardMaterial({map:oceanTexture,roughness:1,metalness:0,emissive:0x030b13,emissiveIntensity:.035}));planet.add(world);
+const cloudShell=new T.Mesh(new T.SphereGeometry(95.3,112,72),new T.MeshStandardMaterial({map:cloudTexture,transparent:true,opacity:.48,roughness:1,depthWrite:false,side:T.FrontSide}));
 planet.add(cloudShell);
 // NASA's real satellite-composite Blue Marble is preferred over procedural land.
 // Three.js's bundled Earth texture is the backup if NASA's image host blocks CORS.
@@ -1002,14 +1002,14 @@ function loadSurfaceWithFallback(urls,onLoaded){
  const tryNext=(index)=>{
   if(index>=urls.length){console.warn('Earth photo textures unavailable; using procedural surface');return}
   satelliteTextures.load(urls[index],texture=>{
-   texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=4;onLoaded(texture)
+   texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());onLoaded(texture)
   },undefined,()=>tryNext(index+1))
  };
  tryNext(0)
 }
 loadSurfaceWithFallback([
- 'https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.png',
- 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_atmos_2048.jpg'
+ 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_atmos_2048.jpg',
+ 'https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.png'
 ],texture=>{
  world.material.map=texture;world.material.color.set(0xffffff);
  inner.material.map=texture;inner.material.needsUpdate=true;
@@ -1021,7 +1021,7 @@ satelliteTextures.load(
  texture=>{
   texture.colorSpace=T.SRGBColorSpace;
   cloudShell.material.map=texture;
-  cloudShell.material.opacity=.88;
+  cloudShell.material.opacity=.64;
   cloudShell.material.needsUpdate=true
  },undefined,()=>console.info('Using procedural clouds')
 );
@@ -1071,7 +1071,32 @@ const atmosphere=new T.Mesh(new T.SphereGeometry(98,64,48),new T.ShaderMaterial(
 }));planet.add(atmosphere);
 // A warm ringed moon beyond the side wing.
 const moon=new T.Group();moon.position.set(-155,65,-280);scene.add(moon);
-const moonSurface=new T.Mesh(new T.SphereGeometry(42,64,48),new T.MeshStandardMaterial({map:moonTexture,roughness:.95,emissive:0x1b1112,emissiveIntensity:.12}));moon.add(moonSurface);
+const moonSurface=new T.Mesh(new T.SphereGeometry(42,96,64),new T.MeshStandardMaterial({map:moonTexture,roughness:1,metalness:0,emissive:0x100908,emissiveIntensity:.04}));moon.add(moonSurface);
+// Textured gas-giant bands: latitude-dependent cloud swirls and storm systems.
+function gasGiantTexture(){
+ const w=1024,h=512,c=document.createElement('canvas');c.width=w;c.height=h;
+ const ctx=c.getContext('2d'),im=ctx.createImageData(w,h),data=im.data;
+ const palette=[[52,47,59],[120,89,79],[187,151,123],[222,193,157],[137,108,104]];
+ for(let y=0;y<h;y++){
+  const latitude=y/h*Math.PI;
+  for(let x=0;x<w;x++){
+   const longitude=x/w*Math.PI*2;
+   const shear=Math.sin(latitude*31+Math.sin(longitude*3+latitude*13)*.38+Math.sin(longitude*9-latitude*6)*.13);
+   const finer=Math.sin(latitude*105+Math.sin(longitude*11)*.65)*.11;
+   const band=(shear*.5+.5+finer)*4;
+   const k=Math.min(3,Math.max(0,Math.floor(band))),t=Math.max(0,Math.min(1,band-k));
+   const storm=Math.exp(-Math.pow((latitude-1.93)*13,2)-Math.pow(Math.atan2(Math.sin(longitude-2.1),Math.cos(longitude-2.1))*5,2));
+   const idx=(y*w+x)*4;
+   for(let channel=0;channel<3;channel++){
+    data[idx+channel]=Math.max(0,Math.min(255,palette[k][channel]*(1-t)+palette[k+1][channel]*t+storm*(channel===0?42:channel===1?13:-10)))
+   }
+   data[idx+3]=255
+  }
+ }
+ ctx.putImageData(im,0,0);const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=8;return tex
+}
+moonSurface.material.map=gasGiantTexture();
+moonSurface.material.needsUpdate=true;
 // Multiple thin flat rings have the correct silhouette and layered translucency.
 const ringSystem=new T.Group();moon.add(ringSystem);ringSystem.rotation.set(.35,.22,.18);
 for(let i=0;i<14;i++){
@@ -1307,6 +1332,17 @@ function buildCleanSpacePanorama(){
   const r=rand()>.98?1.55:.3+rand()*.62;
   g.fillStyle=rand()>.83?'rgba(175,211,255,.7)':'rgba(245,248,255,.54)';
   g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.fill()
+ }
+ // Subtle photographic-style bright-star diffraction and a faint galactic dust lane.
+ for(let i=0;i<22;i++){
+  const x=rand()*W,y=rand()*H*.85+H*.075,brightness=.22+rand()*.4;
+  const halo=g.createRadialGradient(x,y,0,x,y,12+rand()*15);
+  halo.addColorStop(0,'rgba(230,242,255,'+brightness+')');
+  halo.addColorStop(.12,'rgba(140,189,255,.18)');
+  halo.addColorStop(1,'rgba(80,130,200,0)');
+  g.fillStyle=halo;g.fillRect(x-28,y-28,56,56);
+  g.strokeStyle='rgba(198,225,255,.24)';g.lineWidth=.65;
+  g.beginPath();g.moveTo(x-8,y);g.lineTo(x+8,y);g.moveTo(x,y-8);g.lineTo(x,y+8);g.stroke();
  }
  const tx=new T.CanvasTexture(c);
  tx.colorSpace=T.SRGBColorSpace;tx.minFilter=T.LinearFilter;
@@ -1678,21 +1714,23 @@ function walkable(x,z){
  [74,-35,18,19],[0,-121,23,14]];
  return areas.some(([cx,cz,hw,hd])=>Math.abs(x-cx)<hw&&Math.abs(z-cz)<hd)
 }
-// Render quality can be changed instantly without restarting or losing place.
-const qualityNames=['FAST','BALANCED','DETAIL'];
-let qualityManuallySelected=false,slowFrames=0,fastFrames=0;
-function applyQuality(level,automatic=false){
- qualityIndex=Math.max(0,Math.min(2,level));
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,qualityLevels[qualityIndex]));
+// Always render in DETAIL. No automatic downgrade or Balanced/Fast toggle.
+const qualityNames=['DETAIL'];
+const qualityManuallySelected=true;
+let slowFrames=0,fastFrames=0;
+function applyQuality(){
+ qualityIndex=2;
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
  renderer.setSize(innerWidth,innerHeight,false);
- // Do not re-enable floating asteroid debris in the clean single-Earth view.
+ starUniforms.uPixelRatio.value=renderer.getPixelRatio();
  debris.visible=false;
- probe.visible=!photoEnabled&&qualityIndex>0;
- $('quality').textContent='⚙ QUALITY: '+qualityNames[qualityIndex];
- $('quality-note').textContent=automatic?'Performance adjusted automatically':'Display detail: '+qualityNames[qualityIndex];
+ probe.visible=!photoEnabled;
+ $('quality').textContent='✦ DETAIL: ALWAYS ON';
+ $('quality').title='Highest display detail is permanently enabled';
+ $('quality').disabled=true;
+ $('quality-note').textContent='Detail mode locked';
 }
-$('quality').onclick=()=>{qualityManuallySelected=true;applyQuality((qualityIndex+1)%3)};
-applyQuality(qualityIndex);
+applyQuality();
 
 let immersiveUI=false;
 $('immersive').onclick=async()=>{
@@ -1719,13 +1757,7 @@ function render(now){
  if(focusTransition){const f=focusTransition,t=Math.min(1,(now-f.start)/f.duration),e=t*t*(3-2*t);camera.position.lerpVectors(f.from,f.to,e);yaw=f.yawStart+f.yawDelta*e;pitch=f.pitchStart+(f.pitchEnd-f.pitchStart)*e;camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;if(t>=1){focusTransition=null;showArtwork(f.index)}}
  // The distant photographic shell follows the visitor's location, but not
  // their rotation. This makes turning 360° reveal new directions.
- // Auto-lower resolution if sustained frame time exceeds the device budget.
- if(!qualityManuallySelected&&active&&!renderer.xr.isPresenting){
-  if(dt>.041){slowFrames++;fastFrames=0}
-  else if(dt<.021){fastFrames++;slowFrames=Math.max(0,slowFrames-1)}
-  else{slowFrames=Math.max(0,slowFrames-1);fastFrames=0}
-  if(slowFrames>75&&qualityIndex>0){applyQuality(qualityIndex-1,true);slowFrames=0}
- }
+ // Detail mode remains fixed; never downgrade resolution automatically.
  starUniforms.uTime.value=elapsed;solarUniforms.time.value=elapsed;
  orbitalSatellite.position.set(Math.sin(elapsed*.045)*116,15+Math.sin(elapsed*.075)*12,-95+Math.cos(elapsed*.045)*36);
  orbitalSatellite.rotation.y=elapsed*.12;
