@@ -685,24 +685,76 @@ function hallArchitecture(){
   const trim=new T.Mesh(new T.TorusGeometry(r,.14,10,128),brass);
   trim.rotation.x=Math.PI/2;trim.position.set(0,9.8,-22);hall.add(trim)
  }
- // Indoor biophilic planters break the repetitive sci-fi geometry.
- const leaves=new T.MeshStandardMaterial({color:0x2b6654,roughness:.87,side:T.DoubleSide});
- const bark=new T.MeshStandardMaterial({color:0x5c4634,roughness:1});
- for(const x of [-25.5,25.5])for(const z of [0,-16,-33,-47]){
-  cylinder(hall,x,.54,z,1.2,1.05,metal,14);
-  cylinder(hall,x,1.12,z,1.04,.14,brass,14);
-  for(let b=0;b<5;b++){
-   const a=b*Math.PI*2/5+(z*.05);
-   const stem=new T.Mesh(new T.CylinderGeometry(.055,.11,2.3,7),bark);
-   stem.position.set(x+Math.cos(a)*.28,2.4,z+Math.sin(a)*.28);
-   stem.rotation.z=Math.cos(a)*.25;stem.rotation.x=Math.sin(a)*.25;hall.add(stem);
-   for(let j=0;j<4;j++){
-    const leaf=new T.Mesh(new T.SphereGeometry(.58,7,5),leaves);
-    leaf.scale.set(.58,1.3,.4);leaf.position.set(x+Math.cos(a)*(j*.19+.3),2+j*.51,z+Math.sin(a)*(j*.19+.3));
-    leaf.rotation.z=Math.cos(a)*.6;hall.add(leaf)
+ // Living botanical displays: curved lance-shaped leaves, tapered woody
+ // stems, mineral soil and brushed-metal pots. Foliage is GPU-instanced:
+ // hundreds of organic leaves cost only a handful of draw calls.
+ const potSoil=new T.MeshStandardMaterial({color:0x332b22,roughness:1});
+ const potLip=new T.MeshStandardMaterial({color:0xb6a58a,metalness:.66,roughness:.36});
+ const leafMat=new T.MeshStandardMaterial({color:0xffffff,roughness:.86,metalness:0,side:T.DoubleSide});
+ const stemMat=new T.MeshStandardMaterial({color:0x655440,roughness:.98});
+ const leafVertices=[],leafUV=[],leafIndices=[];
+ const segments=9;
+ for(let j=0;j<=segments;j++){
+  const t=j/segments,spread=Math.sin(t*Math.PI)*.235;
+  const curve=Math.sin(t*Math.PI*.72)*.63;
+  const lift=t*1.7-.40*t*t;
+  leafVertices.push(curve-spread,lift,Math.sin(t*Math.PI)*.07,
+                    curve+spread,lift,Math.sin(t*Math.PI)*.07);
+  leafUV.push(0,t,1,t);
+  if(j<segments){const k=j*2;leafIndices.push(k,k+1,k+2,k+1,k+3,k+2)}
+ }
+ const leafGeo=new T.BufferGeometry();
+ leafGeo.setAttribute('position',new T.Float32BufferAttribute(leafVertices,3));
+ leafGeo.setAttribute('uv',new T.Float32BufferAttribute(leafUV,2));
+ leafGeo.setIndex(leafIndices);leafGeo.computeVertexNormals();
+ const locations=[];
+ for(const x of [-25.5,25.5])for(const z of [0,-16,-33,-47])locations.push([x,z]);
+ // One shared material, and predictable leaf positions (no frame-time randomness).
+ const leafCount=locations.length*8*9;
+ const leafMesh=new T.InstancedMesh(leafGeo,leafMat,leafCount);
+ const stemGeo=new T.CylinderGeometry(.055,.13,2.25,7);
+ const stemMesh=new T.InstancedMesh(stemGeo,stemMat,locations.length*8);
+ const dummy=new T.Object3D();let li=0,si=0;
+ for(let p=0;p<locations.length;p++){
+  const [x,z]=locations[p];
+  cylinder(hall,x,.57,z,1.28,1.12,metal,20);
+  cylinder(hall,x,1.14,z,1.12,.14,potLip,20);
+  cylinder(hall,x,1.18,z,1.02,.065,potSoil,20);
+  // Tiny light gravel gives a natural surface instead of a flat plastic disk.
+  const gritMat=new T.MeshStandardMaterial({color:0x857b67,roughness:1});
+  const grit=new T.InstancedMesh(new T.IcosahedronGeometry(.045,0),gritMat,30);
+  for(let j=0;j<30;j++){
+   const angle=j*2.39996,rad=.16+Math.sqrt((j+.5)/30)*.77;
+   dummy.position.set(x+Math.cos(angle)*rad,1.23,z+Math.sin(angle)*rad);
+   dummy.rotation.set(j*.6,j*.3,0);dummy.scale.setScalar(.6+(j%5)*.14);dummy.updateMatrix();
+   grit.setMatrixAt(j,dummy.matrix)
+  }
+  grit.instanceMatrix.needsUpdate=true;hall.add(grit);
+  for(let branch=0;branch<8;branch++){
+   const az=branch*Math.PI*2/8+p*.36;
+   const ox=Math.cos(az)*.28,oz=Math.sin(az)*.28;
+   dummy.position.set(x+ox,2.05,z+oz);
+   dummy.rotation.set(Math.sin(az)*.12,az,Math.cos(az)*.17);
+   dummy.scale.set(1,.80+(branch%3)*.12,1);dummy.updateMatrix();
+   stemMesh.setMatrixAt(si++,dummy.matrix);
+   for(let j=0;j<9;j++){
+    const theta=az+j*2.399963+branch*.13;
+    const t=j/9,baseY=1.5+t*2.2;
+    dummy.position.set(x+ox+Math.cos(az)*t*.35,baseY,z+oz+Math.sin(az)*t*.35);
+    dummy.rotation.set(0,theta,-.20-(j%4)*.15);
+    const scale=.68+(j%4)*.17;
+    dummy.scale.set(scale,scale*(.7+(.9-t)*.35),scale);
+    dummy.updateMatrix();leafMesh.setMatrixAt(li,dummy.matrix);
+    const green=new T.Color().setHSL(.33+(j%4)*.018,.32+(branch%3)*.07,.20+(j%5)*.045);
+    leafMesh.setColorAt(li++,green)
    }
   }
  }
+ leafMesh.instanceMatrix.needsUpdate=true;
+ if(leafMesh.instanceColor)leafMesh.instanceColor.needsUpdate=true;
+ stemMesh.instanceMatrix.needsUpdate=true;
+ leafMesh.castShadow=false;leafMesh.receiveShadow=false;
+ hall.add(stemMesh,leafMesh);
  hall.traverse(o=>{if(o.isMesh)o.receiveShadow=true});
 }
 
