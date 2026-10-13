@@ -207,6 +207,24 @@ function galleryBoard(x,z,angle,i){
  box(g,0,5.38,.32,4.5,.11,.23,rim);
  box(g,0,.17,0,4.85,.35,2.0,shell);
  box(g,0,.39,.75,4.45,.08,.17,ledWarm);
+ // Double-depth frame, warm light trim and individual exhibition label.
+ box(g,0,2.85,.40,4.13,4.58,.045,rim);
+ box(g,0,2.85,.412,4.07,4.52,.045,back);
+ box(g,0,5.58,.24,4.65,.12,.3,ledWarm);
+ const labelCanvas=document.createElement('canvas');
+ labelCanvas.width=512;labelCanvas.height=128;
+ const lg=labelCanvas.getContext('2d');
+ lg.fillStyle='#091523';lg.fillRect(0,0,512,128);
+ lg.strokeStyle='#c8a572';lg.lineWidth=5;lg.strokeRect(4,4,504,120);
+ lg.fillStyle='#ead9bb';lg.textAlign='center';
+ lg.font='bold 27px system-ui,sans-serif';
+ lg.fillText((a.title||'Untitled').slice(0,33),256,57);
+ lg.font='18px system-ui,sans-serif';lg.fillStyle='#96cfe2';
+ lg.fillText('BIPZILLAWORLD  ·  '+String(i+1).padStart(2,'0'),256,95);
+ const labelTx=new T.CanvasTexture(labelCanvas);labelTx.colorSpace=T.SRGBColorSpace;
+ const labelMesh=new T.Mesh(new T.PlaneGeometry(3.7,.84),
+  new T.MeshBasicMaterial({map:labelTx,side:T.DoubleSide}));
+ labelMesh.position.set(0,-.36,1.04);g.add(labelMesh);
  const art=new T.Mesh(new T.PlaneGeometry(4.04,4.48),
   new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide}));
  art.position.set(0,2.85,.43);art.userData={art:a};g.add(art);pickables.push(art);
@@ -1153,14 +1171,7 @@ const artPositions=[
  [0,-132,0]
 ];
 artPositions.forEach((p,i)=>galleryBoard(...p,i));
-const spaceArt=new T.Group();scene.add(spaceArt);
-for(const p of artPositions){
- const [x,z,a]=p;
- const frame=new T.Group();frame.position.set(x,0,z);frame.rotation.y=a;spaceArt.add(frame);
- box(frame,0,2.4,-.34,4.8,5.0,.24,metal);
- box(frame,0,2.4,-.22,4.35,4.55,.12,edge);
- box(frame,0,5.0,-.34,5.0,.12,.22,glow);
-}
+// Gallery frames built inside galleryBoard; avoid duplicate overlays.
 // Nepalese cultural identity is woven into the station's architecture, not
 // substituted for the futuristic space-station setting.
 function makeNepalFlag(){
@@ -1697,21 +1708,8 @@ document.addEventListener('fullscreenchange',()=>{
   $('immersive').textContent='⛶ IMMERSIVE VIEW'
  }
 });
-// WebXR is optional: most Streamlit iframe deployments do not delegate the
-// xr-spatial-tracking permission. No headset support is falsely promised.
-renderer.xr.enabled=true;
-if(navigator.xr&&window.isSecureContext){
- navigator.xr.isSessionSupported('immersive-vr').then(async supported=>{
-  if(!supported){$('vr-info').textContent='Immersive desktop view available · VR headset not detected';return}
-  try{
-   const {VRButton}=await import('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/webxr/VRButton.js');
-   const vr=VRButton.createButton(renderer);
-   vr.style.cssText+=';position:fixed;left:50%;bottom:82px;z-index:9;pointer-events:auto';
-   document.body.appendChild(vr);
-   $('vr-info').textContent='WebXR headset mode available if this host permits it'
-  }catch(e){console.warn('VR entry unavailable',e)}
- }).catch(()=>{$('vr-info').textContent='Headset VR blocked by this host; immersive view still works'});
-}else{$('vr-info').textContent='Immersive view works here; WebXR requires a supported secure browser'}
+// VR support postponed to prioritize smooth mobile gallery.
+renderer.xr.enabled=false;
 function render(now){
  const dt=Math.max(0,Math.min((now-last)/1000,.06));last=now;
  const elapsed=now*.001;
