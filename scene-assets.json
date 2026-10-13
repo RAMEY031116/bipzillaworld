@@ -1,137 +1,10 @@
 {
-  "version": 2,
-  "notes": "Phase 1: arrival gate, hero pagoda, terraces, cliff and courtyard. Models are optional until actual licensed GLB files exist. Do not mark this as visually finished before screenshot review.",
-  "models": [
-    {
-      "id": "arrival-gate",
-      "file": "",
-      "replaces": "arrival-gate",
-      "position": [
-        0,
-        0,
-        42
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "terrain-cliff",
-      "file": "",
-      "replaces": "terrain-cliff",
-      "position": [
-        0,
-        0,
-        -26
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "museum-pavilion",
-      "file": "",
-      "replaces": "museum-pavilion",
-      "position": [
-        0,
-        0,
-        -56
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "main-pagoda",
-      "file": "",
-      "replaces": "main-pagoda",
-      "position": [
-        0,
-        0,
-        -27
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "west-pagoda",
-      "file": "",
-      "replaces": "west-pagoda",
-      "position": [
-        -39,
-        0,
-        -73
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "east-pagoda",
-      "file": "",
-      "replaces": "east-pagoda",
-      "position": [
-        40,
-        0,
-        -77
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "stupa",
-      "file": "",
-      "replaces": "stupa",
-      "position": [
-        92,
-        0,
-        -114
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": true
-    },
-    {
-      "id": "buildings",
-      "file": "",
-      "replaces": "buildings",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotationY": 0,
-      "scale": 1,
-      "castShadow": false
-    },
-    {
-      "id": "patan-chaitya-real-scan",
-      "file": "",
-      "external_url": "https://zenodo.org/records/10293668/files/1f5bf7002a1341d4aa7d417f54178b8d.glb?download=1",
-      "position": [
-        -22,
-        0,
-        27
-      ],
-      "rotationY": 1.15,
-      "scale": 1,
-      "targetHeight": 3.8,
-      "castShadow": true,
-      "source": "https://zenodo.org/records/10293668",
-      "license": "CC BY 4.0",
-      "credit": "Semantic Creation / NepalVR360"
-    }
-  ],
+  "version": 3,
+  "notes": "The active index.html scene is a walkable orbital art museum. Former Nepalese assets are retained as archival configuration but disabled. Add space GLB assets only after changing the orbital loader configuration.",
+  "models": [],
   "panorama": {
     "file": "",
-    "external_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Annapurna_Massif-IMG_5221-Pano.jpg/1280px-Annapurna_Massif-IMG_5221-Pano.jpg",
-    "width": 520,
-    "height": 190,
-    "distance": 235,
-    "verticalOffset": 4,
-    "attribution": "Annapurna Massif photograph © Bijay Chaurasia, CC BY-SA 4.0; via Wikimedia Commons"
+    "external_url": ""
   },
   "quality": {
     "shadows": true,
@@ -139,29 +12,149 @@
     "shadowMapSize": 1024,
     "farView": 520
   },
-  "phase": "phase-1-hero-courtyard",
+  "phase": "orbital-first-release",
   "phase1": {
-    "spawn": [
-      0,
-      2.1,
-      70
+    "status": "space-museum-live-code-committed",
+    "areas": [
+      "Orbital Arrival",
+      "Nebula Gallery",
+      "Planetary Overlook"
     ],
-    "heroTemple": [
-      0,
-      0,
-      -27
+    "artworks": 12
+  },
+  "theme": "orbital-space-museum",
+  "archivedNepalAssets": {
+    "models": [
+      {
+        "id": "arrival-gate",
+        "file": "",
+        "replaces": "arrival-gate",
+        "position": [
+          0,
+          0,
+          42
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "terrain-cliff",
+        "file": "",
+        "replaces": "terrain-cliff",
+        "position": [
+          0,
+          0,
+          -26
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "museum-pavilion",
+        "file": "",
+        "replaces": "museum-pavilion",
+        "position": [
+          0,
+          0,
+          -56
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "main-pagoda",
+        "file": "",
+        "replaces": "main-pagoda",
+        "position": [
+          0,
+          0,
+          -27
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "west-pagoda",
+        "file": "",
+        "replaces": "west-pagoda",
+        "position": [
+          -39,
+          0,
+          -73
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "east-pagoda",
+        "file": "",
+        "replaces": "east-pagoda",
+        "position": [
+          40,
+          0,
+          -77
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "stupa",
+        "file": "",
+        "replaces": "stupa",
+        "position": [
+          92,
+          0,
+          -114
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": true
+      },
+      {
+        "id": "buildings",
+        "file": "",
+        "replaces": "buildings",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotationY": 0,
+        "scale": 1,
+        "castShadow": false
+      },
+      {
+        "id": "patan-chaitya-real-scan",
+        "file": "",
+        "external_url": "https://zenodo.org/records/10293668/files/1f5bf7002a1341d4aa7d417f54178b8d.glb?download=1",
+        "position": [
+          -22,
+          0,
+          27
+        ],
+        "rotationY": 1.15,
+        "scale": 1,
+        "targetHeight": 3.8,
+        "castShadow": true,
+        "source": "https://zenodo.org/records/10293668",
+        "license": "CC BY 4.0",
+        "credit": "Semantic Creation / NepalVR360"
+      }
     ],
-    "entrance": [
-      0,
-      0,
-      42
-    ],
-    "gallerySlots": 6,
-    "targets": {
-      "desktopFPS": 40,
-      "entryTimeSeconds": 3,
-      "quality": "first view must look architectural not blockout"
-    },
-    "status": "live-vertical-slice-in-progress"
+    "panorama": {
+      "file": "",
+      "external_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Annapurna_Massif-IMG_5221-Pano.jpg/1280px-Annapurna_Massif-IMG_5221-Pano.jpg",
+      "width": 520,
+      "height": 190,
+      "distance": 235,
+      "verticalOffset": 4,
+      "attribution": "Annapurna Massif photograph © Bijay Chaurasia, CC BY-SA 4.0; via Wikimedia Commons"
+    }
   }
 }
