@@ -4,8 +4,8 @@
 #modal{position:fixed;inset:0;background:#1b1816ed;z-index:12;display:none;align-items:center;justify-content:center;padding:20px}.panel{display:grid;grid-template-columns:1.1fr .9fr;background:#faf0e2;width:min(1000px,100%);max-height:92vh;overflow:auto}.photo{display:grid;place-items:center;background:#d1c3b5;min-height:350px;padding:22px}.photo img{max-height:76vh;max-width:100%;object-fit:contain}.info{padding:36px;display:flex;flex-direction:column;justify-content:center}.info h2{font-size:38px;letter-spacing:-.04em;margin:15px 0}.info p{color:#66574b;font-size:13px;line-height:1.8}.info button{align-self:start;border:0;color:white;background:#176b9b;padding:12px 19px;margin-top:23px}
 #fallback{display:none;position:fixed;inset:0;z-index:20;overflow:auto;background:#fbf0e3;padding:28px}#fallback .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}#fallback img{width:100%;aspect-ratio:3/4;object-fit:cover}
 @media(max-width:700px){header{padding:10px}.brand{font-size:20px}.small{font-size:8px}.location{padding:7px}.location strong{font-size:11px}.guide{display:none}#reset{top:85px;right:10px}.tabs button{font-size:9px;padding:9px 7px}#intro h1{font-size:67px}.panel{display:block}.photo{min-height:200px}.photo img{max-height:48vh}.info{padding:22px}}#credits{position:absolute;bottom:84px;right:15px;font-size:10px;color:#c8def1;background:#11283ed9;padding:5px 9px;pointer-events:auto}#credits a{color:#683d2f} @media(max-width:700px){#credits{display:none}}
-</style></head><body>
-<div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">AN ART MUSEUM BEYOND EARTH</div></div><div class="location"><div class="small" id="area">BIPZILLA STATION</div><strong id="spot">Orbital Arrival</strong></div></header><button id="reset">↺ RESTART</button><div class="cross">+</div><div id="toast"></div><div id="credits">Original procedural orbital environment · Artwork by BIPZILLAWORLD</div><div id="bottom"><div class="guide"><strong>EXPLORE THE ORBITAL MUSEUM</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Explore the observatories and planetary overlook</div><div class="tabs"><button class="active" data-zone="0">ORBITAL HUB</button><button data-zone="1">NEBULA GALLERY</button><button data-zone="2">PLANET OVERLOOK</button></div></div></div>
+#immersive{position:absolute;top:151px;right:15px;pointer-events:auto;border:1px solid #4c829d;background:#142b44ec;color:#eaf3ff;padding:11px 13px;font-size:11px;font-weight:800;letter-spacing:.08em}body.immersive-ui header,body.immersive-ui #bottom,body.immersive-ui #credits,body.immersive-ui #reset,body.immersive-ui .cross{opacity:0;pointer-events:none}body.immersive-ui #immersive{opacity:.8}#vr-info{position:absolute;top:201px;right:15px;max-width:190px;color:#b6d5e9;background:#081b2dd9;padding:7px;font-size:10px;line-height:1.5;pointer-events:none}@media(max-width:700px){#immersive{top:123px;right:10px}#vr-info{top:173px;right:10px}}</style></head><body>
+<div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">AN ART MUSEUM BEYOND EARTH</div></div><div class="location"><div class="small" id="area">BIPZILLA STATION</div><strong id="spot">Orbital Arrival</strong></div></header><button id="reset">↺ RESTART</button><button id="immersive" type="button">⛶ IMMERSIVE VIEW</button><div id="vr-info">3D space experience · headset VR where supported</div><div class="cross">+</div><div id="toast"></div><div id="credits">Original procedural orbital environment · Artwork by BIPZILLAWORLD</div><div id="bottom"><div class="guide"><strong>EXPLORE THE ORBITAL MUSEUM</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Explore the observatories and planetary overlook</div><div class="tabs"><button class="active" data-zone="0">ORBITAL HUB</button><button data-zone="1">NEBULA GALLERY</button><button data-zone="2">PLANET OVERLOOK</button></div></div></div>
 <div id="intro"><div><div class="small" style="font-size:12px">STARS · PLANETS · ART · EXPLORATION</div><h1>BIPZILLA<br><b>WORLD.</b></h1><p>Step aboard an extraordinary art museum orbiting a distant world. Wander luminous observation halls, discover artworks across the station and look out over the planets.</p><button id="enter">ENTER THE WORLD →</button><p style="font-size:11px;margin-top:20px">An original interactive space-art experience · Best on desktop</p></div></div>
 <div id="modal"><div class="panel"><div class="photo" id="photo"></div><div class="info"><div class="small">ARTWORK FROM BIPZILLAWORLD</div><h2 id="title"></h2><p id="description"></p><button id="close">← RETURN TO WORLD</button></div></div></div><div id="fallback"><h1>BIPZILLAWORLD</h1><p>The 3D engine couldn't load. Browse the artwork collection:</p><div class="grid" id="fallbackgrid"></div></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
@@ -647,7 +647,18 @@ const atmosphere=new T.Mesh(new T.SphereGeometry(98,64,48),new T.ShaderMaterial(
 // A warm ringed moon beyond the side wing.
 const moon=new T.Group();moon.position.set(-155,65,-280);scene.add(moon);
 const moonSurface=new T.Mesh(new T.SphereGeometry(42,64,48),new T.MeshStandardMaterial({map:moonTexture,roughness:.95,emissive:0x1b1112,emissiveIntensity:.12}));moon.add(moonSurface);
-const mr=torus(moon,0,0,0,62,7,new T.MeshStandardMaterial({color:0xb3a8b2,transparent:true,opacity:.6,side:T.DoubleSide,roughness:1}),Math.PI*.31);mr.rotation.y=.2;
+// Multiple thin flat rings have the correct silhouette and layered translucency.
+const ringSystem=new T.Group();moon.add(ringSystem);ringSystem.rotation.set(.35,.22,.18);
+for(let i=0;i<14;i++){
+ const innerRadius=50+i*2.15,outerRadius=innerRadius+1.6+(i%3)*.3;
+ const material=new T.MeshStandardMaterial({
+  color:new T.Color().setHSL(.08+(i%4)*.013,.14+(i%3)*.05,.45+(i%5)*.04),
+  transparent:true,opacity:.35+(i%4)*.12,roughness:1,metalness:0,
+  side:T.DoubleSide,depthWrite:false
+ });
+ const ring=new T.Mesh(new T.RingGeometry(innerRadius,outerRadius,128),material);
+ ring.rotation.x=-Math.PI/2;ringSystem.add(ring)
+}
 // A nearby rocky debris field adds real parallax when the visitor turns.
 const asteroidGeometry=new T.IcosahedronGeometry(1,1);
 const asteroidMaterials=[
@@ -790,13 +801,66 @@ window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!mod
 window.addEventListener('keyup',e=>keys[e.code]=false);
 renderer.domElement.addEventListener('wheel',e=>{camera.fov=T.MathUtils.clamp(camera.fov+Math.sign(e.deltaY)*3,46,87);camera.updateProjectionMatrix()},{passive:true});
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-function render(now){requestAnimationFrame(render);const dt=Math.min((now-last)/1000,.06);last=now;
- if(active&&!modal){const forward=Number(!!(keys.KeyW||keys.ArrowUp))-Number(!!(keys.KeyS||keys.ArrowDown));const strafe=Number(!!(keys.KeyD||keys.ArrowRight))-Number(!!(keys.KeyA||keys.ArrowLeft));
- const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*strafe)*dt*6.2,dz=(-Math.cos(yaw)*forward-Math.sin(yaw)*strafe)*dt*6.2;
- let nx=T.MathUtils.clamp(camera.position.x+dx,-175,175),nz=T.MathUtils.clamp(camera.position.z+dz,-180,75);
- if(!colliders.some(o=>Math.hypot(nx-o.x,nz-o.z)<o.r+1.1)){camera.position.x=nx;camera.position.z=nz}
- camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
- }renderer.render(scene,camera)}
-teleport(0);requestAnimationFrame(render);
+function walkable(x,z){
+ // Prevent visitors walking off the station into empty space.
+ const areas=[[0,-22,31,35],[0,38,7.6,25],[0,-85,7.6,29],
+ [-60,-35,28,7.5],[60,-35,28,7.5],[-74,-35,18,19],
+ [74,-35,18,19],[0,-121,23,14]];
+ return areas.some(([cx,cz,hw,hd])=>Math.abs(x-cx)<hw&&Math.abs(z-cz)<hd)
+}
+let immersiveUI=false;
+$('immersive').onclick=async()=>{
+ immersiveUI=!immersiveUI;
+ document.body.classList.toggle('immersive-ui',immersiveUI);
+ $('immersive').textContent=immersiveUI?'✕ EXIT IMMERSIVE':'⛶ IMMERSIVE VIEW';
+ if(immersiveUI&&document.documentElement.requestFullscreen){
+   try{await document.documentElement.requestFullscreen()}catch(e){console.info('Fullscreen unavailable inside this embed',e)}
+ }else if(!immersiveUI&&document.fullscreenElement){
+   try{await document.exitFullscreen()}catch(e){}
+ }
+};
+document.addEventListener('fullscreenchange',()=>{
+ if(!document.fullscreenElement&&immersiveUI){
+  immersiveUI=false;document.body.classList.remove('immersive-ui');
+  $('immersive').textContent='⛶ IMMERSIVE VIEW'
+ }
+});
+// WebXR is optional: most Streamlit iframe deployments do not delegate the
+// xr-spatial-tracking permission. No headset support is falsely promised.
+renderer.xr.enabled=true;
+if(navigator.xr&&window.isSecureContext){
+ navigator.xr.isSessionSupported('immersive-vr').then(async supported=>{
+  if(!supported){$('vr-info').textContent='Immersive desktop view available · VR headset not detected';return}
+  try{
+   const {VRButton}=await import('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/webxr/VRButton.js');
+   const vr=VRButton.createButton(renderer);
+   vr.style.cssText+=';position:fixed;left:50%;bottom:82px;z-index:9;pointer-events:auto';
+   document.body.appendChild(vr);
+   $('vr-info').textContent='WebXR headset mode available if this host permits it'
+  }catch(e){console.warn('VR entry unavailable',e)}
+ }).catch(()=>{$('vr-info').textContent='Headset VR blocked by this host; immersive view still works'});
+}else{$('vr-info').textContent='Immersive view works here; WebXR requires a supported secure browser'}
+function render(now){
+ const dt=Math.max(0,Math.min((now-last)/1000,.06));last=now;
+ const elapsed=now*.001;
+ starUniforms.uTime.value=elapsed;
+ world.rotation.y+=dt*.006;cloudShell.rotation.y+=dt*.008;
+ moonSurface.rotation.y+=dt*.003;ringSystem.rotation.z+=dt*.0007;
+ core.rotation.y+=dt*.13;core.rotation.z=Math.sin(elapsed*.12)*.045;
+ probe.rotation.y+=dt*.04;debris.rotation.y+=dt*.001;
+ if(active&&!modal&&!renderer.xr.isPresenting){
+  const forward=Number(!!(keys.KeyW||keys.ArrowUp))-Number(!!(keys.KeyS||keys.ArrowDown));
+  const strafe=Number(!!(keys.KeyD||keys.ArrowRight))-Number(!!(keys.KeyA||keys.ArrowLeft));
+  const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*strafe)*dt*6.2;
+  const dz=(-Math.cos(yaw)*forward-Math.sin(yaw)*strafe)*dt*6.2;
+  const sx=(Math.cos(yaw)*strafe)*dt*6.2;
+  const sz=(-Math.sin(yaw)*strafe)*dt*6.2;
+  const nx=camera.position.x+dx+sx,nz=camera.position.z+dz+sz;
+  if(walkable(nx,nz)){camera.position.x=nx;camera.position.z=nz}
+  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch
+ }
+ renderer.render(scene,camera)
+}
+teleport(0);renderer.setAnimationLoop(render);
 
 </script></body></html>
