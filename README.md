@@ -2,6 +2,14 @@
 
 **Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
 
+### Cinematic observatory rebuild + original artist collection — October 2026
+
+The active 3D world now has a **marble-finished observation hall** with physically based environment reflections, bronze-and-gunmetal architecture, panoramic window framing, curved ceiling ribs, an elevated balcony, glass rails, warm exhibition spotlights, indoor greenery, and a miniature Earth globe sculpture. The external Earth is larger in the main forward view. This is actual walkable Three.js geometry, **not a flat generated picture**. The generated concept image is a visual target rather than an in-world texture.
+
+**Nineteen original artwork slots:** `artworks.json` now lists the nineteen earlier uploaded works as `art/01.jpg` through `art/19.jpg`; the 3D scene has nineteen framed displays and keeps the artwork click-to-inspect interaction. `app.py` selects an original JPG when present and otherwise temporarily falls back to the existing SVG. The image files are **not yet present in the remote GitHub repository**. A separate upload pack, `BIPZILLAWORLD-original-19-artworks-upload-pack.zip`, was prepared in the chat with all nineteen JPGs. Extract it and upload `01.jpg` through `19.jpg` to the repo's `art/` folder to activate them on Streamlit. The user-supplied image files are not silently substituted by unrelated generated art.
+
+**Limitations:** This pass improves materials, architectural depth and gallery layout but is still a procedural Three.js build, not a scanned photorealistic environment. Browser rendering and FPS remain unverified. On low-power devices, physically based reflections and extra geometry may reduce performance.
+
 ### Earth and Sun realism pass — October 2026
 
 The forward observation view now frames **Earth and the Sun**. Earth uses NASA/GSFC's [Blue Marble 2048×1024 satellite-composite texture](https://svs.gsfc.nasa.gov/2915/) when the image host permits cross-origin loading, with an official Three.js Earth texture fallback and the existing procedural planet as the last fallback. The Earth has a separate moving cloud layer, night-side city-light texture (optional, from the Three.js example assets), and an atmosphere glow. The Sun uses an animated procedural plasma shader and corona. Earth was brought closer to make it more prominent from the museum arrival point.
