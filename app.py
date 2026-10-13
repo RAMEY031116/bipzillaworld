@@ -91,32 +91,11 @@ def museum():
         parsed.hostname in ("thumb.wikimedia.org", "upload.wikimedia.org")
     ):
         panorama["url"] = external
-    # Streamlit components.html runs in a separate iframe. Local relative image
-    # URLs there do not resolve to repository files; embed the optimized WebP.
-    backdrop_encoded = ROOT / "assets" / "orbital-cinematic.b64"
-    backdrop_path = ROOT / "assets" / "orbital-cinematic.webp"
-    backdrop_data = ""
-    if backdrop_encoded.is_file():
-        backdrop_data = "data:image/webp;base64," + backdrop_encoded.read_text(
-            encoding="ascii"
-        ).strip()
-    elif backdrop_path.is_file():
-        backdrop_data = "data:image/webp;base64," + base64.b64encode(
-            backdrop_path.read_bytes()
-        ).decode("ascii")
-    panorama_encoded = ROOT / "assets" / "orbital-360-panorama.b64"
-    panorama_path = ROOT / "assets" / "orbital-360-panorama.webp"
-    panorama_data = ""
-    if panorama_encoded.is_file():
-        panorama_data = "data:image/webp;base64," + panorama_encoded.read_text(
-            encoding="ascii"
-        ).strip()
-    elif panorama_path.is_file():
-        panorama_data = "data:image/webp;base64," + base64.b64encode(
-            panorama_path.read_bytes()
-        ).decode("ascii")
-    html = html.replace("__CINEMATIC_PANORAMA__", json.dumps(panorama_data))
-    html = html.replace("__CINEMATIC_BACKDROP__", json.dumps(backdrop_data))
+    # The new 360° starfield is generated locally and displays one real Earth.
+    # Do not embed obsolete multi-Earth panoramas into the iframe; that would
+    # waste memory and slow startup, especially on mobile devices.
+    html = html.replace("__CINEMATIC_PANORAMA__", '""')
+    html = html.replace("__CINEMATIC_BACKDROP__", '""')
     html = html.replace("__SCENE_CONFIG__", json.dumps(config).replace("</", "<\\/"))
     return html.replace("__ART_DATA__", json.dumps(works).replace("</", "<\\/"))
 
