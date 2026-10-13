@@ -12,6 +12,14 @@
 
 **Performance:** shadows disabled in the scene manifest; mobile panorama downsampled; static architectural instancing and FAST/BALANCED/DETAIL remain. This has passed source-level syntax checks only, **not a deployed browser render, FPS benchmark, or headset test**.
 
+### Walkable architectural realism — October 2026
+
+The next upgrade adds genuine textured Three.js architecture to the panoramic museum, rather than trying to simulate the whole station with more pictures. A tiled, metallic floor overlay has panel joints and brass inlays; the two side observatories now have three-dimensional bulkheads, observation-window framing, illuminated metalwork and external sightlines; four interactive-area control consoles sit near the main gallery windows. The additional panels share geometry and materials, so the existing instancing pass can batch many of them. The 360-degree image is retained as the distant exterior only.
+
+Walking now uses one normalized movement vector (fixes doubled sideways speed), supports sliding against station boundaries and clamps vertical view. The original artwork galleries, Nepal flags, quality selector, mobile touch controls and panoramic/3D toggle remain intact.
+
+**QA:** JavaScript syntax checked after each commit. The scene has not been tested visually or benchmarked in a live WebGL browser. This is an incremental architectural improvement, not yet a complete photogrammetric or production-grade photorealistic environment.
+
 ### Parallax / panorama realism update
 
 The viewer now blends the 360-degree panoramic horizon with additional **genuine 3D geometry outside the station**: two multi-ring docking structures, solar-panel spacecraft docks, a slowly orbiting satellite and hundreds of perspective-correct star points. These elements change their relative positions when the visitor moves, rather than being baked into the panorama. The panoramic texture is also wrapped with crossfaded left/right seam columns and darkened poles, which reduces abrupt stitch lines and the worst stretching overhead. Mobile uses a 2048×1024 panorama and a smaller star layer; desktop uses 4096×2048.
