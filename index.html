@@ -26,8 +26,8 @@ const hemi=new T.HemisphereLight(0xfff0d9,0x74776c,2.15);scene.add(hemi);
 const sun=new T.DirectionalLight(0xffe2b8,2.05);sun.position.set(-65,105,50);
 sun.castShadow=renderer.shadowMap.enabled;
 sun.shadow.mapSize.set(visualQuality.shadowMapSize||1024,visualQuality.shadowMapSize||1024);
-sun.shadow.camera.left=-125;sun.shadow.camera.right=125;
-sun.shadow.camera.top=125;sun.shadow.camera.bottom=-125;
+sun.shadow.camera.left=-88;sun.shadow.camera.right=88;
+sun.shadow.camera.top=88;sun.shadow.camera.bottom=-88;
 sun.shadow.camera.near=1;sun.shadow.camera.far=320;
 sun.shadow.bias=-.00035;sun.shadow.normalBias=.025;
 scene.add(sun);
@@ -168,7 +168,78 @@ function mountainRange(z,offset,base,peak,color){
  geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();
  const ridge=new T.Mesh(geo,new T.MeshLambertMaterial({vertexColors:true,side:T.DoubleSide}));scene.add(ridge);scenicMountains.push(ridge)
 }
-function tree(x,z,h=7){const g=new T.Group();g.position.set(x,0,z);scene.add(g);pole(g,0,h*.35,0,.35,h*.7,M.wood,7);for(let k=0;k<3;k++)cone(g,0,h*.5+k*h*.17,0,2.5-k*.37,h*.6,M.green,9)}
+
+// Organic tree crowns. One batch of irregular foliage clumps replaces the old cone trees.
+const treePositions=[];
+function tree(x,z,h=7){treePositions.push({x,z,h})}
+function buildVegetation(){
+ let seed=224411;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ const leaves=[],trunks=[],branches=[];
+ for(const {x,z,h} of treePositions){
+   trunks.push({x,y:h*.34,z,r:.25+h*.013,scale:h*.67,tilt:(rand()-.5)*.16});
+   const n=4+Math.floor(rand()*3);
+   for(let j=0;j<n;j++){
+     const a=rand()*Math.PI*2,r=(.8+rand()*1.6),yy=h*(.40+rand()*.38),length=r*1.7;
+     branches.push({x:x+Math.cos(a)*r*.45,y:yy,z:z+Math.sin(a)*r*.45,length,angle:a});
+   }
+   for(let j=0;j<34;j++){
+     const a=rand()*Math.PI*2,r=Math.sqrt(rand())*(2.1+h*.065),cy=h*(.55+rand()*.36);
+     leaves.push({x:x+Math.cos(a)*r,y:cy,z:z+Math.sin(a)*r,
+       sx:.38+rand()*.65,sy:.36+rand()*.63,sz:.36+rand()*.62,
+       color:new T.Color().setHSL(.25+rand()*.07,.20+rand()*.22,.21+rand()*.13)})
+   }
+ }
+ function instanced(geo,mat,data,pose){
+   const mesh=new T.InstancedMesh(geo,mat,data.length),m=new T.Matrix4();
+   data.forEach((item,i)=>{let {pos,rot,scale}=pose(item);
+     m.compose(pos,rot,scale);mesh.setMatrixAt(i,m);if(item.color)mesh.setColorAt(i,item.color)});
+   mesh.instanceMatrix.needsUpdate=true;if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;scene.add(mesh);return mesh
+ }
+ instanced(new T.CylinderGeometry(.22,.38,1,7),M.wood,trunks,t=>({
+   pos:new T.Vector3(t.x,t.y,t.z),
+   rot:new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),t.tilt),
+   scale:new T.Vector3(1,t.scale,1)})).castShadow=true;
+ const branchMesh=instanced(new T.CylinderGeometry(.08,.15,1,6),M.wood,branches,t=>{
+   const dir=new T.Vector3(Math.cos(t.angle),.55,Math.sin(t.angle)).normalize();
+   return {pos:new T.Vector3(t.x,t.y,t.z),rot:new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),dir),scale:new T.Vector3(1,t.length,1)}
+ });branchMesh.castShadow=false;
+ const foliageMat=new T.MeshLambertMaterial({color:0xffffff,roughness:1,vertexColors:false});
+ const foliage=instanced(new T.IcosahedronGeometry(1,1),foliageMat,leaves,t=>({
+   pos:new T.Vector3(t.x,t.y,t.z),rot:new T.Quaternion(),
+   scale:new T.Vector3(t.sx,t.sy,t.sz)
+ }));
+ foliage.castShadow=false;foliage.receiveShadow=false;
+}
+function guardianLion(x,z,angle=0){
+ // Compact stone guardian sculpture with paws, mane, tail and a pedestal.
+ // It's stylised secondary scenery, not a historic sculpture scan.
+ const g=new T.Group();g.position.set(x,0,z);g.rotation.y=angle;scene.add(g);
+ const stone=M.stone,detail=M.dark;
+ box(g,0,.37,0,2.8,.7,2.3,stone);
+ const ell=(px,py,pz,sx,sy,sz,m=stone)=>{let o=new T.Mesh(new T.SphereGeometry(1,12,8),m);o.position.set(px,py,pz);o.scale.set(sx,sy,sz);g.add(o);return o};
+ ell(0,1.78,-.2,.94,1.16,.78);
+ ell(0,2.92,.36,1.08,1.02,.9);
+ for(let i=0;i<10;i++){const a=i*Math.PI/5;ell(Math.cos(a)*.84,2.84+Math.sin(a)*.76,.28,.30,.33,.30)}
+ ell(0,2.63,1.13,.67,.40,.46);
+ for(const sx of [-1,1]){ell(sx*.42,3.0,1.10,.13,.13,.08,detail);ell(sx*.57,1.1,.74,.37,.67,.45);ell(sx*.63,.58,1.1,.43,.2,.48)}
+ ell(0,2.56,1.53,.23,.15,.16,detail);
+ const tail=new T.Mesh(new T.TorusGeometry(.50,.13,6,16,Math.PI*1.35),stone);
+ tail.position.set(0,2.05,-1.05);tail.rotation.y=Math.PI/2;g.add(tail);
+ g.traverse(o=>{if(o.isMesh)o.castShadow=true});return g
+}
+function courtyardDetails(){
+ guardianLion(-12,-7,-.22);guardianLion(12,-7,.22);
+ const bronze=new T.MeshStandardMaterial({color:0x67523a,roughness:.63,metalness:.52});
+ function bell(x,z){const g=new T.Group();g.position.set(x,0,z);scene.add(g);
+  box(g,0,.3,0,1.9,.55,1.9,M.stone);
+  for(let q=0;q<4;q++)pole(g,0,.75+q*.42,0,.64-q*.09,.4,bronze,14);
+  const bellShape=new T.Mesh(new T.CylinderGeometry(.25,.65,1.0,16,1,true),bronze);
+  bellShape.position.y=2.0;g.add(bellShape);
+  pole(g,0,2.85,0,.11,.80,bronze);
+  g.traverse(o=>{if(o.isMesh)o.castShadow=true})}
+ bell(-19,-15);bell(19,-15);
+}
+
 // A small curated world; no procedurally duplicated rooms or dozens of lights.
 plane(0,-75,410,390,M.grass,-.18);
 plane(0,-12,107,125,M.stone,.035);
@@ -186,6 +257,7 @@ stupa(92,-114);
 const lake=new T.Mesh(new T.PlaneGeometry(125,125),M.water);lake.rotation.x=-Math.PI/2;lake.position.set(-145,-.1,-100);scene.add(lake);
 for(let n=0;n<3;n++)mountainRange(-260-n*37,n*1.82,19+n*23,22+n*20,[0x657e75,0x8fa4a4,0xbacace][n]);
 for(let i=0;i<22;i++){const x=-170+(i%8)*47,z=-155+Math.floor(i/8)*67;if(Math.abs(x)<77&&z>-116)continue;tree(x,z,6+(i%3)*1.7)}
+buildVegetation();courtyardDetails();
 const points=[[25,17,Math.PI],[-25,17,Math.PI],[29,-3,-Math.PI/2],[-29,-3,Math.PI/2],[-25,-99,0],[25,-99,0],[-49,-47,Math.PI/2],[49,-47,-Math.PI/2],[75,-123,-Math.PI/2],[100,-90,Math.PI],[0,-111,0],[-75,-42,Math.PI/2]];
 points.forEach((p,i)=>galleryBoard(...p,i));
 
@@ -227,7 +299,7 @@ async function loadExternalSceneAssets(){
       const width=bg.width||500,height=bg.height||180,d=bg.distance||245;
       const scenic=new T.Mesh(new T.PlaneGeometry(width,height),
         new T.MeshBasicMaterial({map:tex,side:T.DoubleSide,transparent:true,depthWrite:false}));
-      scenic.position.set(0,(bg.verticalOffset||16)+height*.30,-d);
+      scenic.position.set(0,(bg.verticalOffset??16)+height*.32,-d);
       scenic.renderOrder=-1;
       scene.add(scenic);
       // Hide the procedural distant ridges when photographic scenery is present.
