@@ -84,9 +84,14 @@ def museum():
         panorama["url"] = external
     # Streamlit components.html runs in a separate iframe. Local relative image
     # URLs there do not resolve to repository files; embed the optimized WebP.
+    backdrop_encoded = ROOT / "assets" / "orbital-cinematic.b64"
     backdrop_path = ROOT / "assets" / "orbital-cinematic.webp"
     backdrop_data = ""
-    if backdrop_path.is_file():
+    if backdrop_encoded.is_file():
+        backdrop_data = "data:image/webp;base64," + backdrop_encoded.read_text(
+            encoding="ascii"
+        ).strip()
+    elif backdrop_path.is_file():
         backdrop_data = "data:image/webp;base64," + base64.b64encode(
             backdrop_path.read_bytes()
         ).decode("ascii")
