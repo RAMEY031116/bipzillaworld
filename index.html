@@ -454,6 +454,134 @@ function cylinder(g,x,y,z,r,h,m,segments=32){const o=new T.Mesh(new T.CylinderGe
 function torus(g,x,y,z,r,t,m,rotationX=Math.PI/2){const o=new T.Mesh(new T.TorusGeometry(r,t,10,80),m);o.rotation.x=rotationX;o.position.set(x,y,z);g.add(o);return o}
 function litLine(g,x,y,z,w,d){box(g,x,y,z,w,.055,d,glow)}
 function platform(g,x,z,w,d){box(g,x,-.54,z,w,1.05,d,metal);box(g,x,-.015,z,w,.09,d,floor);for(const a of [-1,1])litLine(g,x+a*(w/2-.24),.055,z,.11,d-.7);for(const a of [-1,1])litLine(g,x,.055,z+a*(d/2-.24),w-.7,.11)}
+// Premium orbital museum finishes: layered marble veining, metal grilles,
+// warm edge lighting and transparent balustrades instead of solid-color blocks.
+function marbleTexture(){
+ const c=document.createElement('canvas');c.width=512;c.height=512;
+ const ctx=c.getContext('2d');const data=ctx.createImageData(512,512),p=data.data;
+ for(let y=0;y<512;y++)for(let x=0;x<512;x++){
+  const u=x/512,v=y/512;
+  const grain=fbm(u*11,v*11,331);
+  const band=Math.sin(u*17+v*13+Math.sin(v*22+u*7)*1.4+grain*3.5);
+  const veins=Math.pow(Math.max(0,band),19);
+  const c0=91+grain*54-veins*59;
+  const k=(y*512+x)*4;p[k]=c0*.85;p[k+1]=c0*.98;p[k+2]=c0*1.18;p[k+3]=255
+ }
+ ctx.putImageData(data,0,0);
+ const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;
+ tx.wrapS=tx.wrapT=T.RepeatWrapping;tx.repeat.set(3,3);tx.anisotropy=4;return tx
+}
+const marble=new T.MeshPhysicalMaterial({
+ map:marbleTexture(),color:0xe3eaf3,metalness:.23,roughness:.14,
+ clearcoat:.9,clearcoatRoughness:.12
+});
+const brass=new T.MeshStandardMaterial({color:0xb99464,metalness:.94,roughness:.19});
+const velvet=new T.MeshStandardMaterial({color:0x102331,metalness:.08,roughness:.85});
+const ledWarm=new T.MeshBasicMaterial({color:0xffd19a});
+const ledCool=new T.MeshBasicMaterial({color:0x6bd7ff});
+const windowGlass=new T.MeshPhysicalMaterial({
+ color:0x9bc5ec,transparent:true,opacity:.055,roughness:.035,
+ metalness:0,side:T.DoubleSide,depthWrite:false
+});
+function tube(g,points,radius,material){
+ const curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)));
+ const mesh=new T.Mesh(new T.TubeGeometry(curve,Math.max(24,points.length*4),radius,7,false),material);
+ g.add(mesh);return mesh
+}
+function hallArchitecture(){
+ const hall=new T.Group();scene.add(hall);
+ // Realistic flooring is raised above the structural hull but remains walkable.
+ box(hall,0,.005,-22,62,.12,69,marble);
+ for(const side of [-1,1]){
+  box(hall,side*29.5,.09,-22,.23,.06,66,brass);
+  box(hall,side*30,1.1,-22,.13,2.1,66,windowGlass);
+  box(hall,side*30,2.25,-22,.16,.16,66,brass);
+  for(let z=-52;z<10;z+=7.5){
+   box(hall,side*30,1.12,z,.22,2.35,.24,metal);
+   box(hall,side*30,2.27,z,.44,.17,.44,brass)
+  }
+ }
+ // Huge framed windows, not a solid back wall: visitors see the planet.
+ for(let i=0;i<=8;i++){
+  const x=-30+i*7.5;
+  tube(hall,[[x,0,-57],[x,3,-57.2],[x,11,-57.5],[x*.9,17,-55.8],[x*.6,20,-53]],.46,metal);
+  tube(hall,[[x+.3,0,-56.8],[x+.3,3,-57],[x+.3,11,-57.3],[x*.9+.3,17,-55.6],[x*.6+.3,20,-52.8]],.065,brass)
+ }
+ for(let y of [2.7,11.5,18.5]){
+  tube(hall,Array.from({length:17},(_,i)=>{
+   const x=-30+i*3.75;return [x,y+Math.sin(i/16*Math.PI)*(y>15?1.3:0),-57+Math.pow(x/30,2)*4]
+  }),y>15?.4:.2,y>15?metal:brass)
+ }
+ // Curved ceiling arches run over the visitor, creating strong parallax.
+ for(let z=-51;z<=8;z+=9){
+  tube(hall,Array.from({length:21},(_,i)=>{
+   const a=i/20*Math.PI;
+   return [-29*Math.cos(a),5+15*Math.sin(a),z]
+  }),.34,metal);
+  tube(hall,Array.from({length:21},(_,i)=>{
+   const a=i/20*Math.PI;
+   return [-28.6*Math.cos(a),5+14.65*Math.sin(a),z+.14]
+  }),.085,ledWarm)
+ }
+ // Thin ceiling baffles, bronze details, and display-spot lighting.
+ for(let z=-48;z<8;z+=5){
+  for(const x of [-25,-17,17,25]){
+   box(hall,x,12.6,z,.15,.1,3.7,brass);
+   const lamp=new T.SpotLight(0xffddba,9,18,Math.PI/5,.6,1.4);
+   lamp.position.set(x,12,z);lamp.target.position.set(x,1.3,z-2);
+   hall.add(lamp,lamp.target)
+  }
+ }
+ // Inlaid marble rings and gold outlines around the holographic globe.
+ for(let radius of [10.5,12.7,16.2,22]){
+  const ring=new T.Mesh(new T.TorusGeometry(radius,radius===22?.14:.07,8,160),radius===22?brass:ledWarm);
+  ring.rotation.x=Math.PI/2;ring.position.set(0,.12,-22);hall.add(ring)
+ }
+ // Raised stepped centre pedestal, with a warm brass plinth.
+ cylinder(hall,0,.24,-22,5.5,.4,brass,72);
+ cylinder(hall,0,.49,-22,4.85,.22,marble,72);
+ cylinder(hall,0,.78,-22,3.75,.42,metal,72);
+ for(let i=0;i<12;i++){
+  const a=i*Math.PI/6;
+  const p=new T.Mesh(new T.SphereGeometry(.11,10,8),ledWarm);
+  p.position.set(Math.cos(a)*4.8,.65,-22+Math.sin(a)*4.8);hall.add(p)
+ }
+ // Balcony around the central rotunda; supports, glass and brass rails.
+ for(let i=0;i<64;i++){
+  const a=i/64*Math.PI*2,r=26.7,x=Math.cos(a)*r,z=-22+Math.sin(a)*r;
+  const p=new T.Mesh(new T.BoxGeometry(2.65,.45,3.0),marble);
+  p.position.set(x,8.5,z);p.rotation.y=-a;hall.add(p);
+  if(i%4===0){
+   box(hall,x,4.5,z,.5,8.4,.5,metal);
+   const rail=new T.Mesh(new T.BoxGeometry(.11,2.2,2.7),windowGlass);
+   rail.position.set(x,10,z);rail.rotation.y=-a;hall.add(rail)
+  }
+ }
+ for(const r of [25.4,27.9]){
+  const trim=new T.Mesh(new T.TorusGeometry(r,.14,10,128),brass);
+  trim.rotation.x=Math.PI/2;trim.position.set(0,9.8,-22);hall.add(trim)
+ }
+ // Indoor biophilic planters break the repetitive sci-fi geometry.
+ const leaves=new T.MeshStandardMaterial({color:0x2b6654,roughness:.87,side:T.DoubleSide});
+ const bark=new T.MeshStandardMaterial({color:0x5c4634,roughness:1});
+ for(const x of [-25.5,25.5])for(const z of [0,-16,-33,-47]){
+  cylinder(hall,x,.54,z,1.2,1.05,metal,14);
+  cylinder(hall,x,1.12,z,1.04,.14,brass,14);
+  for(let b=0;b<5;b++){
+   const a=b*Math.PI*2/5+(z*.05);
+   const stem=new T.Mesh(new T.CylinderGeometry(.055,.11,2.3,7),bark);
+   stem.position.set(x+Math.cos(a)*.28,2.4,z+Math.sin(a)*.28);
+   stem.rotation.z=Math.cos(a)*.25;stem.rotation.x=Math.sin(a)*.25;hall.add(stem);
+   for(let j=0;j<4;j++){
+    const leaf=new T.Mesh(new T.SphereGeometry(.58,7,5),leaves);
+    leaf.scale.set(.58,1.3,.4);leaf.position.set(x+Math.cos(a)*(j*.19+.3),2+j*.51,z+Math.sin(a)*(j*.19+.3));
+    leaf.rotation.z=Math.cos(a)*.6;hall.add(leaf)
+   }
+  }
+ }
+ hall.traverse(o=>{if(o.isMesh)o.receiveShadow=true});
+}
+
 // The central museum, three walkable observation wings and a connecting spine.
 const station=new T.Group();scene.add(station);
 platform(station,0,-22,64,72);
@@ -464,6 +592,7 @@ platform(station,60,-35,57,16);
 platform(station,-74,-35,38,40);
 platform(station,74,-35,38,40);
 platform(station,0,-121,48,30);
+hallArchitecture();
 // A monumental portal with depth, ribs and restrained luminous details.
 for(const z of [60,49]){
   for(const side of [-1,1]){box(station,side*8.0,7.8,z,1.9,15.6,2.3,metal);box(station,side*8.0,6.2,z+1.25,.22,11.5,.18,edge)}
