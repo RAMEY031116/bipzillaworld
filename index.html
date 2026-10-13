@@ -1101,36 +1101,87 @@ const backdropToggle=$('backdrop-toggle');
 const backdropNote=$('backdrop-note');
 const spaceFog=scene.fog,spaceBackground=scene.background;
 let photoReady=false,photoEnabled=false;
-const photoBackdrop=new Image();
-photoBackdrop.decoding='async';
-photoBackdrop.onload=()=>{
- photoReady=true;
- cinematicSky.style.backgroundImage=`url("${PHOTO_SOURCE}")`;
- backdropNote.textContent='Photo scenery + interactive 3D museum';
- setPhotoMode(true)
-};
-photoBackdrop.onerror=()=>{
- backdropNote.textContent='3D space active · cinematic asset unavailable';
- backdropToggle.textContent='✦ ADD PHOTO BACKDROP';
- backdropToggle.title='Cinematic asset unavailable on this deployment'
-};
-photoBackdrop.src=PHOTO_SOURCE;
+let panoramaMesh=null,panoramaTexture=null,panoramaIs360=false;
+const PANORAMA_SOURCE=await (async()=>{
+ try{const injected=__CINEMATIC_PANORAMA__;if(injected)return injected}catch(e){}
+ try{
+  const r=await fetch('./assets/orbital-360-panorama.b64');
+  if(r.ok)return 'data:image/webp;base64,'+(await r.text()).trim()
+ }catch(e){}
+ return 'assets/orbital-360-panorama.webp'
+})();
+function loadImage(url){
+ return new Promise((resolve,reject)=>{
+  const image=new Image();image.decoding='async';
+  image.onload=()=>resolve(image);image.onerror=reject;image.src=url
+ })
+}
+function buildPanorama(image,is360){
+ if(panoramaMesh){scene.remove(panoramaMesh);panoramaMesh.geometry.dispose();panoramaMesh.material.dispose();panoramaTexture.dispose()}
+ // The image is mapped inside a sphere: looking behind you reveals different
+ // scenery rather than keeping the same photograph fixed to the screen.
+ let texture;
+ if(is360){
+  texture=new T.Texture(image);texture.needsUpdate=true
+ }else{
+  // Compatibility mode for older deployments: a single cinematic picture
+  // is wrapped around the horizon with mirrored sections to avoid seams.
+  const canvas=document.createElement('canvas');canvas.width=2048;canvas.height=1024;
+  const c=canvas.getContext('2d');c.fillStyle='#040918';c.fillRect(0,0,2048,1024);
+  for(let i=0;i<4;i++){
+   c.save();c.translate(i*512+(i%2?512:0),190);
+   c.scale(i%2?-1:1,1);
+   c.drawImage(image,0,0,image.width,image.height,0,0,512,650);
+   c.restore()
+  }
+  texture=new T.CanvasTexture(canvas)
+ }
+ texture.colorSpace=T.SRGBColorSpace;
+ texture.minFilter=T.LinearFilter;texture.magFilter=T.LinearFilter;
+ texture.generateMipmaps=false;texture.wrapS=T.RepeatWrapping;
+ const geometry=new T.SphereGeometry(430,isMobileDevice?40:64,isMobileDevice?24:36);
+ const material=new T.MeshBasicMaterial({map:texture,side:T.BackSide,depthWrite:false,fog:false});
+ panoramaMesh=new T.Mesh(geometry,material);
+ panoramaMesh.renderOrder=-1000;panoramaMesh.frustumCulled=false;
+ // Face the forward window toward the Earth-focused photo segment.
+ panoramaMesh.rotation.y=Math.PI/2;
+ scene.add(panoramaMesh);panoramaTexture=texture;
+ panoramaIs360=is360
+}
 function setPhotoMode(enabled){
  if(enabled&&!photoReady)return;
  photoEnabled=enabled;
- document.body.classList.toggle('photo-space',enabled);
- scene.background=enabled?null:spaceBackground;
+ // Never leave the old fixed CSS photograph behind the canvas.
+ document.body.classList.remove('photo-space');
+ cinematicSky.style.backgroundImage='none';
+ scene.background=enabled?new T.Color(0x030713):spaceBackground;
  scene.fog=enabled?null:spaceFog;
+ if(panoramaMesh)panoramaMesh.visible=enabled;
  for(const o of [planet,moon,distantSun,stars,debris,probe])o.visible=!enabled;
  for(const sprite of scene.children.filter(o=>o.isSprite))sprite.visible=!enabled;
- backdropToggle.textContent=enabled?'✦ PHOTO SCENERY: ON':'✦ PHOTO SCENERY: OFF';
- backdropNote.textContent=enabled?'Walkable 3D foreground · cinematic image outside':'Fully 3D outer-space background'
+ backdropToggle.textContent=enabled?'↻ 360° PANORAMA: ON':'↻ 360° PANORAMA: OFF';
+ backdropNote.textContent=enabled
+  ?(panoramaIs360?'360° view · turn to see different sides':'360° look · mirrored single photo')
+  :'Original real-time 3D space scenery'
 }
 backdropToggle.onclick=()=>{
- if(!photoReady){notice('Cinematic asset unavailable; try refreshing after redeployment');return}
+ if(!photoReady){notice('360° image still loading');return}
  setPhotoMode(!photoEnabled)
 };
-
+// Prefer four-perspective panoramic art; keep older photo as a fallback.
+loadImage(PANORAMA_SOURCE).then(image=>{
+ buildPanorama(image,true);photoReady=true;setPhotoMode(true);
+ backdropNote.textContent='360° image installed · turn left or right'
+}).catch(async()=>{
+ try{
+  const image=await loadImage(PHOTO_SOURCE);
+  buildPanorama(image,false);photoReady=true;setPhotoMode(true);
+  backdropNote.textContent='360° fallback · mirrored single image'
+ }catch(e){
+  backdropNote.textContent='360° photo unavailable · original 3D space active';
+  backdropToggle.textContent='↻ 3D SPACE MODE'
+ }
+});
 // Batch static architecture boxes into instanced draw calls. This changes
 // rendering only; original art planes stay independent for click inspection.
 function batchStaticBoxes(){
@@ -1238,7 +1289,7 @@ $('reset').onclick=()=>teleport(0);$('close').onclick=dismiss;$('modal').onclick
 document.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>teleport(Number(b.dataset.zone)));
 renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;downX=e.clientX;downY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
 renderer.domElement.addEventListener('pointerup',e=>{if(Math.hypot(e.clientX-downX,e.clientY-downY)<5&&active&&!modal)inspect();dragging=false});
-renderer.domElement.addEventListener('pointermove',e=>{if(!dragging||modal||!active)return;yaw-=e.movementX*.0034;pitch=T.MathUtils.clamp(pitch-e.movementY*.0034,-1.26,1.26)});
+renderer.domElement.addEventListener('pointermove',e=>{if(!dragging||modal||!active)return;yaw-=e.movementX*.0034;pitch=T.MathUtils.clamp(pitch-e.movementY*.0034,-1.08,1.08)});
 window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!modal)inspect();if(e.code==='Escape')dismiss();if(e.code.startsWith('Arrow'))e.preventDefault()});
 window.addEventListener('keyup',e=>keys[e.code]=false);
 renderer.domElement.addEventListener('wheel',e=>{camera.fov=T.MathUtils.clamp(camera.fov+Math.sign(e.deltaY)*3,46,87);camera.updateProjectionMatrix()},{passive:true});
@@ -1300,7 +1351,7 @@ if(navigator.xr&&window.isSecureContext){
 function render(now){
  const dt=Math.max(0,Math.min((now-last)/1000,.06));last=now;
  const elapsed=now*.001;
- if(photoEnabled){cinematicSky.style.transform=`translate3d(${Math.sin(yaw)*-1.6}%,${Math.sin(pitch)*1.4}%,0)`}
+ if(photoEnabled&&panoramaMesh)panoramaMesh.position.copy(camera.position);
  // Auto-lower resolution if sustained frame time exceeds the device budget.
  if(!qualityManuallySelected&&active&&!renderer.xr.isPresenting){
   if(dt>.041){slowFrames++;fastFrames=0}
