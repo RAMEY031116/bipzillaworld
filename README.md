@@ -1,4 +1,30 @@
-# BIPZILLAWORLD 🎨
+# BIPZILLAWORLD — Orbital Art Museum 🌌
+
+**Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
+
+### What's in the space museum
+
+- **5,100 depth-positioned stars**, with GPU-drawn soft point sprites, different star temperatures and gentle animated scintillation.
+- Two diffuse **nebula clouds** and a luminous distant sun.
+- A **3D blue planet** with seeded surface textures for ocean, land, polar ice, a separate animated cloud sphere and a shader-based atmospheric limb glow.
+- A **3D ringed moon** with crater-like rocky texture and fourteen thin translucent rings.
+- A **225-piece instanced asteroid field**, an animated scientific probe with solar arrays, and the station's rotating central holographic sculpture.
+- Illuminated observation wings, artwork boards and three teleport destinations. Walking is limited to station walkways.
+- **Immersive View** button: hides HUD and requests browser fullscreen (if permitted).
+- **Experimental headset WebXR**: a VR entry button is offered *only if* the browser reports immersive-vr support and the host allows it. **Streamlit's embedded iframe may block headset permissions**, and VR controller navigation is not yet implemented. Do not describe headset support as universally available.
+
+### Running it
+
+The existing Streamlit deployment still uses `app.py` and preserves the private `?admin=1` artist dashboard and `artworks.json`.
+
+The `index.html` viewer also supports **standalone HTTPS hosting**, loading `artworks.json` and `scene-assets.json` from the same directory when Streamlit has not injected them. This is useful for trying WebXR outside the Streamlit iframe. GitHub Pages is a possible host **if enabled in repository settings**, but no GitHub Pages deployment has been configured or verified by this change.
+
+**Verification:** JavaScript syntax was checked after edits. Browser rendering, actual headset support, performance and visual quality have not been tested on the user's deployment. Planet/star textures are original procedural approximations, **not NASA imagery or photogrammetric scans**.
+
+---
+
+## Previous Nepal/Himalayan development (archived)
+
 
 > **Creative direction and build specification:** [Hidden Himalayan Museum production blueprint](HIDDEN_HIMALAYAN_MUSEUM_BLUEPRINT.md) — the six-zone layout, required real 3D assets, lighting, atmosphere, performance targets, and acceptance criteria. The blueprint does not mean all models have been implemented yet.
 
