@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "notes": "Add optimized GLB files to assets/models and put their paths below. Existing procedural architecture remains visible until each model loads successfully. Positions use world units.",
+  "models": [
+    {
+      "id": "main-pagoda",
+      "file": "",
+      "replaces": "main-pagoda",
+      "position": [
+        0,
+        0,
+        -27
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
+    {
+      "id": "west-pagoda",
+      "file": "",
+      "replaces": "west-pagoda",
+      "position": [
+        -39,
+        0,
+        -73
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
+    {
+      "id": "east-pagoda",
+      "file": "",
+      "replaces": "east-pagoda",
+      "position": [
+        40,
+        0,
+        -77
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
+    {
+      "id": "stupa",
+      "file": "",
+      "replaces": "stupa",
+      "position": [
+        92,
+        0,
+        -114
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": true
+    },
+    {
+      "id": "buildings",
+      "file": "",
+      "replaces": "buildings",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotationY": 0,
+      "scale": 1,
+      "castShadow": false
+    }
+  ],
+  "panorama": {
+    "file": "",
+    "width": 500,
+    "height": 180,
+    "distance": 245,
+    "verticalOffset": 16
+  },
+  "quality": {
+    "shadows": true,
+    "maxPixelRatio": 1.25,
+    "shadowMapSize": 1024,
+    "farView": 520
+  }
+}
