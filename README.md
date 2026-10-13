@@ -1,5 +1,31 @@
 # BIPZILLAWORLD 🎨
 
+## Asset-ready semi-realistic Nepal scene (October 2026)
+
+The WebGL scene now supports replacing the procedural temple models with actual **glTF binary (`.glb`) 3D assets**. It includes optional soft directional sun shadows and photographic Himalayan backdrop support.
+
+### Add a detailed temple model
+1. Obtain or make a low-to-medium-poly, properly licensed Nepali pagoda model in GLB format (ideally 5–25 MB with baked or PBR textures).
+2. Upload it to `assets/models/` in the repository.
+3. Open `scene-assets.json` and change `models[0].file` from `""` to `"assets/models/temple.glb"`.
+4. Adjust `position`, `rotationY` and `scale` if necessary. The main temple is currently centred at world coordinates `[0, 0, -27]`.
+5. Commit: Streamlit redeploys, the model loads from the public GitHub raw URL, and the procedural pagoda gets hidden **only if loading succeeds**.
+
+Additional slots: `west-pagoda`, `east-pagoda`, `stupa`, and `buildings`. The last slot overlays the existing buildings by default; to replace them fully, models need matching fallback grouping.
+
+### Use real Himalayan imagery
+Upload a licensed mountain panorama to `assets/scenery/himalayas.webp`, then set `panorama.file` in `scene-assets.json` to `"assets/scenery/himalayas.webp"`. This displays the photograph on a distant scenic plane and hides the procedurally generated mountain meshes once the image loads.
+
+For the best effect, use a properly cropped wide panorama (e.g. 4096×1024), with mountains in the lower portion and transparent or matching sky. A plain rectangular photo does not blend perfectly without transparency/masking.
+
+### Performance and realism
+- Sunlight uses one 1024-pixel shadow map, PCF soft shadows and no extra dynamic lights.
+- The existing procedural geometry, low-resolution canvas material maps and temporary artwork still work as fallback.
+- Use **GLB with embedded texture resources**, moderate mesh counts and compressed textures; very large models or 4K materials can cause Streamlit browser memory pressure.
+- The current fallback is still stylised. **The appearance only becomes asset-driven after model and panorama files are supplied.**
+- Streamlit private artist dashboard at `?admin=1` and the artwork catalogue remain unchanged.
+
+
 ## Kathmandu temple-square rebuild (current)
 
 ### Rendering pass — October 2026
