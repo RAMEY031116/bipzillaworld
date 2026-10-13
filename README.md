@@ -1,5 +1,20 @@
 # BIPZILLAWORLD 🎨
 
+## Kathmandu environment enhancement — October 2026
+
+This version focuses on a small, scenic simulation rather than an enormous open world.
+
+- **Actual Himalayas photograph:** the scene attempts to load Bijay Chaurasia's Annapurna panorama from Wikimedia Commons. If blocked, geometric distant terrain remains as a fallback. Photo © Bijay Chaurasia / Wikimedia Commons, licensed CC BY-SA 4.0, attribution appears in the UI.
+- **Authentic photographic materials:** at runtime it requests 1K CC0 Poly Haven materials (red brick, red brick pavers, rock ground, dark planks and clay roof tiles), with normal maps where available. Existing browser-generated textures remain as fallback if CDN access is blocked. The live API/material source is credited in the UI as requested by Poly Haven.
+- **Vegetation:** replaced conical trees with organic, irregular canopies, angled branches and bark trunks rendered through batched instancing to keep draw calls manageable.
+- **Temple props:** added guardian-lion-inspired stone sculptures and bronze bell-like ornaments. These are stylistic approximations, *not historical scans*.
+- **Performance:** distant mountains are scenic imagery rather than a fully explorable high-poly world. Most foliage does not cast individual dynamic shadows.
+
+The **temples/buildings are still procedural**, not photogrammetry or scanned GLB geometry. To reach true semi-realism up close, import properly modelled pagoda/stupa/townhouse assets via `scene-assets.json`. The artist publishing dashboard is preserved, and artwork placeholders remain replaceable.
+
+**Dependencies:** The 3D viewer loads Three.js from jsDelivr, optional material maps from Poly Haven, and the panorama from Wikimedia; these remote assets require an internet connection. If remote texture loads fail, the scene uses lightweight local procedural textures; if WebGL fails, an artwork-gallery fallback is shown.
+
+
 ## Scenic realism update — real Himalayan photography and temple details
 
 This pass makes a meaningful visual improvement without turning BIPZILLAWORLD into a large open-world game:
