@@ -1127,40 +1127,66 @@ function loadImage(url){
  })
 }
 function buildPanorama(image,is360){
- if(panoramaMesh){scene.remove(panoramaMesh);panoramaMesh.geometry.dispose();panoramaMesh.material.dispose();panoramaTexture.dispose()}
- // The image is mapped inside a sphere: looking behind you reveals different
- // scenery rather than keeping the same photograph fixed to the screen.
- let texture;
- if(is360){
-  if(isMobileDevice){
-   const c=document.createElement('canvas');c.width=2048;c.height=1024;
-   c.getContext('2d').drawImage(image,0,0,2048,1024);
-   texture=new T.CanvasTexture(c)
-  }else{texture=new T.Texture(image);texture.needsUpdate=true}
- }else{
-  // Compatibility mode for older deployments: a single cinematic picture
-  // is wrapped around the horizon with mirrored sections to avoid seams.
-  const canvas=document.createElement('canvas');canvas.width=2048;canvas.height=1024;
-  const c=canvas.getContext('2d');c.fillStyle='#040918';c.fillRect(0,0,2048,1024);
-  for(let i=0;i<4;i++){
-   c.save();c.translate(i*512+(i%2?512:0),190);
-   c.scale(i%2?-1:1,1);
-   c.drawImage(image,0,0,image.width,image.height,0,0,512,650);
-   c.restore()
-  }
-  texture=new T.CanvasTexture(canvas)
+ if(panoramaMesh){
+  scene.remove(panoramaMesh);panoramaMesh.geometry.dispose();
+  panoramaMesh.material.dispose();panoramaTexture.dispose()
  }
- texture.colorSpace=T.SRGBColorSpace;
- texture.minFilter=T.LinearFilter;texture.magFilter=T.LinearFilter;
- texture.generateMipmaps=false;texture.wrapS=T.RepeatWrapping;
- const geometry=new T.SphereGeometry(430,isMobileDevice?40:64,isMobileDevice?24:36);
+ // The stitched source may have hard seams and pinched ceiling/floor.
+ // Bake an overlap-blended wrap, and fade the poles into deep-space black.
+ // This removes the obvious cut when the visitor rotates through 360 degrees.
+ const W=isMobileDevice?2048:4096,H=W/2;
+ const c=document.createElement('canvas');c.width=W;c.height=H;
+ const g=c.getContext('2d',{alpha:false});
+ g.fillStyle='#030713';g.fillRect(0,0,W,H);
+ if(is360){
+  g.drawImage(image,0,0,W,H);
+  const seam=Math.floor(W*.035);
+  // The first/last columns are gently crossfaded, making the wrap continuous.
+  const strip=document.createElement('canvas');strip.width=seam;strip.height=H;
+  const sc=strip.getContext('2d');sc.drawImage(c,0,0,seam,H,0,0,seam,H);
+  const right=document.createElement('canvas');right.width=seam;right.height=H;
+  right.getContext('2d').drawImage(c,W-seam,0,seam,H,0,0,seam,H);
+  for(let x=0;x<seam;x++){
+   const t=x/(seam-1),fade=t*t*(3-2*t);
+   g.globalAlpha=1-fade;
+   g.drawImage(right,x,0,1,H,x,0,1,H);
+   g.globalAlpha=fade;
+   g.drawImage(strip,x,0,1,H,x,0,1,H);
+   g.globalAlpha=1
+  }
+  for(let x=0;x<seam;x++){
+   const t=x/(seam-1),fade=t*t*(3-2*t);
+   g.globalAlpha=1-fade;
+   g.drawImage(right,x,0,1,H,W-seam+x,0,1,H);
+   g.globalAlpha=fade;
+   g.drawImage(strip,x,0,1,H,W-seam+x,0,1,H);
+   g.globalAlpha=1
+  }
+ }else{
+  for(let i=0;i<4;i++){
+   g.save();g.translate(i*W/4+(i%2?W/4:0),H*.16);
+   g.scale(i%2?-1:1,1);
+   g.drawImage(image,0,0,image.width,image.height,0,0,W/4,H*.72);
+   g.restore()
+  }
+ }
+ // Avoid warped architecture stretched to a single point above your head.
+ for(const top of [true,false]){
+  const grad=g.createLinearGradient(0,top?0:H,0,top?H*.20:H*.80);
+  grad.addColorStop(0,'rgba(3,7,19,1)');
+  grad.addColorStop(1,'rgba(3,7,19,0)');
+  g.fillStyle=grad;g.fillRect(0,top?0:H*.80,W,H*.20)
+ }
+ const texture=new T.CanvasTexture(c);
+ texture.colorSpace=T.SRGBColorSpace;texture.minFilter=T.LinearFilter;
+ texture.magFilter=T.LinearFilter;texture.generateMipmaps=false;
+ texture.wrapS=T.RepeatWrapping;texture.anisotropy=1;
+ const geometry=new T.SphereGeometry(430,isMobileDevice?48:80,isMobileDevice?28:48);
  const material=new T.MeshBasicMaterial({map:texture,side:T.BackSide,depthWrite:false,fog:false});
  panoramaMesh=new T.Mesh(geometry,material);
  panoramaMesh.renderOrder=-1000;panoramaMesh.frustumCulled=false;
- // Face the forward window toward the Earth-focused photo segment.
  panoramaMesh.rotation.y=Math.PI/2;
- scene.add(panoramaMesh);panoramaTexture=texture;
- panoramaIs360=is360
+ scene.add(panoramaMesh);panoramaTexture=texture;panoramaIs360=is360
 }
 function setPhotoMode(enabled){
  if(enabled&&!photoReady)return;
