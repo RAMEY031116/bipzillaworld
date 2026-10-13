@@ -42,10 +42,14 @@ def museum():
             if p.parts and not p.is_absolute() and ".." not in p.parts:
                 target = ROOT / p
                 if target.is_file():
-                    mime = mimetypes.guess_type(target.name)[0] or "image/jpeg"
-                    w["image"] = "data:" + mime + ";base64," + base64.b64encode(target.read_bytes()).decode("ascii")
+                    # Serve real uploaded files via CDN rather than embedding
+                    # every full-resolution image into the Streamlit iframe.
+                    # Only gallery bays near the visitor request their textures.
+                    w["image"] = "https://cdn.jsdelivr.net/gh/" + REPO + "@main/" + primary.as_posix()
                     break
         if not w["image"] and primary.as_posix() in original_images:
+            # Historical originals are kept in the legacy inline pack until
+            # they can be migrated to individual files.
             w["image"] = original_images[primary.as_posix()]
         if not w["image"] and fallback.parts and not fallback.is_absolute() and ".." not in fallback.parts:
             target = ROOT / fallback
