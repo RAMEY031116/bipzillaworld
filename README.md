@@ -2,6 +2,12 @@
 
 **Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
 
+### Earth and Sun realism pass — October 2026
+
+The forward observation view now frames **Earth and the Sun**. Earth uses NASA/GSFC's [Blue Marble 2048×1024 satellite-composite texture](https://svs.gsfc.nasa.gov/2915/) when the image host permits cross-origin loading, with an official Three.js Earth texture fallback and the existing procedural planet as the last fallback. The Earth has a separate moving cloud layer, night-side city-light texture (optional, from the Three.js example assets), and an atmosphere glow. The Sun uses an animated procedural plasma shader and corona. Earth was brought closer to make it more prominent from the museum arrival point.
+
+**Honest visual status:** Earth's image is real satellite-derived data when the texture loads, but this is still a real-time 3D simulation rather than a photographic scene. The Sun is a stylized shader, not a live telescope image. No live-browser screenshot or FPS test has been performed. Credit: NASA/Goddard Space Flight Center Scientific Visualization Studio; Blue Marble data courtesy of Reto Stöckli (NASA/GSFC).
+
 ### What's in the space museum
 
 - **5,100 depth-positioned stars**, with GPU-drawn soft point sprites, different star temperatures and gentle animated scintillation.
