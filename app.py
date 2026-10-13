@@ -50,6 +50,18 @@ def museum():
             path.parts and not path.is_absolute() and ".." not in path.parts
             and path.suffix.lower() == ".glb"
         ) else ""
+        # A small independently licensed Nepal heritage scan is available
+        # directly from Zenodo. Do not permit arbitrary untrusted URLs.
+        from urllib.parse import urlparse
+        remote = str(entry.get("external_url", ""))
+        parsed_model = urlparse(remote)
+        if not entry["url"] and (
+            parsed_model.scheme == "https"
+            and parsed_model.hostname == "zenodo.org"
+            and parsed_model.path.startswith("/records/10293668/files/")
+            and parsed_model.path.endswith(".glb")
+        ):
+            entry["url"] = remote
     panorama = config.get("panorama", {})
     p = Path(str(panorama.get("file", "")))
     panorama["url"] = (raw_base + p.as_posix()) if (
