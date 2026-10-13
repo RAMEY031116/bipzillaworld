@@ -316,7 +316,17 @@ function showExhibitionPage(page){
  const pages=Math.max(1,Math.ceil(ART.length/capacity));
  exhibitionPage=(page%pages+pages)%pages;
  const start=exhibitionPage*capacity;
- galleryFrames.forEach((frame,i)=>updateFrame(frame,i<capacity?start+i:ART.length));
+ // Mobile shows a balanced mix of frames across ALL three wings.
+ // The 30 active bays are spread around the station, not all on one side.
+ const mobileSlots=new Set([0,1,2,3,4,5,6,7,8,9,10,11,
+                           16,17,18,19,20,21,
+                           29,30,31,32,33,34,
+                           42,43,44,45,46,47]);
+ let ordinal=0;
+ galleryFrames.forEach((frame,i)=>{
+  const enabled=!isMobileDevice||mobileSlots.has(i);
+  updateFrame(frame,enabled?start+ordinal++:ART.length)
+ });
  // Raycasting should never select an empty or hidden frame.
  pickables.length=0;
  for(const frame of galleryFrames)if(frame.g.visible)pickables.push(frame.art);
