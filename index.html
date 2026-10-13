@@ -5,7 +5,7 @@
 #fallback{display:none;position:fixed;inset:0;z-index:20;overflow:auto;background:#fbf0e3;padding:28px}#fallback .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}#fallback img{width:100%;aspect-ratio:3/4;object-fit:cover}
 @media(max-width:700px){header{padding:10px}.brand{font-size:20px}.small{font-size:8px}.location{padding:7px}.location strong{font-size:11px}.guide{display:none}#reset{top:85px;right:10px}.tabs button{font-size:9px;padding:9px 7px}#intro h1{font-size:67px}.panel{display:block}.photo{min-height:200px}.photo img{max-height:48vh}.info{padding:22px}}#credits{position:absolute;bottom:84px;right:15px;font-size:10px;color:#493d35;background:#fff6e3ce;padding:5px 9px;pointer-events:auto}#credits a{color:#683d2f} @media(max-width:700px){#credits{display:none}}
 </style></head><body>
-<div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">A NEPAL-INSPIRED INTERACTIVE ART WORLD</div></div><div class="location"><div class="small" id="area">KATHMANDU VALLEY</div><strong id="spot">Temple Square</strong></div></header><button id="reset">↺ RESTART</button><div class="cross">+</div><div id="toast"></div><div id="credits">Himalayan panorama: <a href="https://commons.wikimedia.org/wiki/File:Annapurna_Massif-IMG_5221-Pano.jpg" target="_blank" rel="noopener noreferrer">Bijay Chaurasia / Wikimedia Commons · CC BY-SA 4.0</a> · Materials: <a href="https://polyhaven.com" target="_blank" rel="noopener noreferrer">Poly Haven (CC0)</a></div><div id="bottom"><div class="guide"><strong>EXPLORE THE TEMPLE SQUARE</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Discover the stupa, lake & hillside</div><div class="tabs"><button class="active" data-zone="0">TEMPLE SQUARE</button><button data-zone="1">STUPA HILL</button><button data-zone="2">POKHARA</button></div></div></div>
+<div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">A NEPAL-INSPIRED INTERACTIVE ART WORLD</div></div><div class="location"><div class="small" id="area">KATHMANDU VALLEY</div><strong id="spot">Temple Square</strong></div></header><button id="reset">↺ RESTART</button><div class="cross">+</div><div id="toast"></div><div id="credits">Himalayan panorama: <a href="https://commons.wikimedia.org/wiki/File:Annapurna_Massif-IMG_5221-Pano.jpg" target="_blank" rel="noopener noreferrer">Bijay Chaurasia / Wikimedia Commons · CC BY-SA 4.0</a> · <a href="https://zenodo.org/records/10293668" target="_blank" rel="noopener noreferrer">Patan shrine scan: NepalVR360 / Semantic Creation, CC BY</a> · Materials: <a href="https://polyhaven.com" target="_blank" rel="noopener noreferrer">Poly Haven (CC0)</a></div><div id="bottom"><div class="guide"><strong>EXPLORE THE TEMPLE SQUARE</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Discover the stupa, lake & hillside</div><div class="tabs"><button class="active" data-zone="0">TEMPLE SQUARE</button><button data-zone="1">STUPA HILL</button><button data-zone="2">POKHARA</button></div></div></div>
 <div id="intro"><div><div class="small" style="font-size:12px">TEMPLES · COURTYARDS · MOUNTAINS · ART</div><h1>BIPZILLA<br><b>WORLD.</b></h1><p>Walk through a Kathmandu-inspired square with multi-tiered pagoda temples, carved-looking timber details and brick courtyards. Explore a stupa, the Himalayas and a lakeside art trail.</p><button id="enter">ENTER THE WORLD →</button><p style="font-size:11px;margin-top:20px">An artistic interpretation of Nepalese architecture · Best on desktop</p></div></div>
 <div id="modal"><div class="panel"><div class="photo" id="photo"></div><div class="info"><div class="small">ARTWORK FROM BIPZILLAWORLD</div><h2 id="title"></h2><p id="description"></p><button id="close">← RETURN TO WORLD</button></div></div></div><div id="fallback"><h1>BIPZILLAWORLD</h1><p>The 3D engine couldn't load. Browse the artwork collection:</p><div class="grid" id="fallbackgrid"></div></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
@@ -347,8 +347,21 @@ async function loadExternalSceneAssets(){
           const object=gltf.scene;
           object.position.fromArray(entry.position||[0,0,0]);
           object.rotation.y=entry.rotationY||0;
-          if(Array.isArray(entry.scale))object.scale.fromArray(entry.scale);
-          else object.scale.setScalar(entry.scale||1);
+          if(entry.targetHeight){
+            object.updateMatrixWorld(true);
+            const bounds=new T.Box3().setFromObject(object),height=bounds.max.y-bounds.min.y;
+            if(Number.isFinite(height)&&height>.001){
+              const factor=entry.targetHeight/height;
+              object.scale.multiplyScalar(factor);
+              object.updateMatrixWorld(true);
+              const scaledBox=new T.Box3().setFromObject(object);
+              object.position.y-=scaledBox.min.y;
+            }
+          }
+          if(!entry.targetHeight){
+            if(Array.isArray(entry.scale))object.scale.fromArray(entry.scale);
+            else object.scale.setScalar(entry.scale||1);
+          }
           object.traverse(node=>{
             if(node.isMesh){
               node.castShadow=entry.castShadow!==false;
