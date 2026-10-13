@@ -70,10 +70,12 @@
   ],
   "panorama": {
     "file": "",
-    "width": 500,
-    "height": 180,
-    "distance": 245,
-    "verticalOffset": 16
+    "external_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Annapurna_Massif-IMG_5221-Pano.jpg/1280px-Annapurna_Massif-IMG_5221-Pano.jpg",
+    "width": 520,
+    "height": 190,
+    "distance": 235,
+    "verticalOffset": 4,
+    "attribution": "Annapurna Massif photograph © Bijay Chaurasia, CC BY-SA 4.0; via Wikimedia Commons"
   },
   "quality": {
     "shadows": true,
