@@ -1,3 +1,11 @@
+### Permanent DETAIL mode and space realism — October 2026
+
+The 3D viewer now starts and remains in **DETAIL** on both desktop and mobile: the quality selector is locked, the automatic frame-time resolution downgrade has been removed, and the device pixel ratio is capped at 1.5 for sharper rendering. This prioritizes image quality over frame rate; lower-powered phones may run less smoothly.
+
+Visual updates include denser Earth sphere/cloud meshes, photographic Earth textures preferred from a CDN with fallback, more physically restrained ambient/sun lighting, a procedurally textured banded ringed gas giant, and a scattering of brighter haloed stars in the seamless 360° sky. These are realtime 3D planets rather than multiple planets painted into a backdrop. Existing artwork interactions, original 19-piece collection and admin tools are preserved.
+
+QA: JavaScript syntax and repository references checked. Live rendering, mobile GPU performance, and remote texture availability have not been browser-tested.
+
 # BIPZILLAWORLD — Orbital Art Museum 🌌
 
 **Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
