@@ -1,74 +1,135 @@
 [
   {
-    "image": "art/temp-01.svg",
-    "title": "Kathmandu Windows",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Kathmandu Courtyard"
+    "image": "art/01.jpg",
+    "fallback_image": "art/temp-01.svg",
+    "title": "Original Artwork 01",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-02.svg",
-    "title": "Phewa Lake",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Kathmandu Courtyard"
+    "image": "art/02.jpg",
+    "fallback_image": "art/temp-02.svg",
+    "title": "Original Artwork 02",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-03.svg",
-    "title": "Himalayan Morning",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Kathmandu Courtyard"
+    "image": "art/03.jpg",
+    "fallback_image": "art/temp-03.svg",
+    "title": "Original Artwork 03",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-04.svg",
-    "title": "Hill Garden",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Pokhara Lakeside"
+    "image": "art/04.jpg",
+    "fallback_image": "art/temp-04.svg",
+    "title": "Original Artwork 04",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-05.svg",
-    "title": "Valley Rhythms",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Pokhara Lakeside"
+    "image": "art/05.jpg",
+    "fallback_image": "art/temp-05.svg",
+    "title": "Original Artwork 05",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-06.svg",
-    "title": "City Rooftops",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Pokhara Lakeside"
+    "image": "art/06.jpg",
+    "fallback_image": "art/temp-06.svg",
+    "title": "Original Artwork 06",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-07.svg",
-    "title": "Marigold Sky",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Himalayan Hills"
+    "image": "art/07.jpg",
+    "fallback_image": "art/temp-07.svg",
+    "title": "Original Artwork 07",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-08.svg",
-    "title": "Mountain Lines",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Himalayan Hills"
+    "image": "art/08.jpg",
+    "fallback_image": "art/temp-08.svg",
+    "title": "Original Artwork 08",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-09.svg",
-    "title": "Courtyard Stories",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Himalayan Hills"
+    "image": "art/09.jpg",
+    "fallback_image": "art/temp-09.svg",
+    "title": "Original Artwork 09",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-10.svg",
-    "title": "Pokhara Breeze",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Valley Sketches"
+    "image": "art/10.jpg",
+    "fallback_image": "art/temp-10.svg",
+    "title": "Original Artwork 10",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-11.svg",
-    "title": "Monsoon Colour",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Valley Sketches"
+    "image": "art/11.jpg",
+    "fallback_image": "art/temp-11.svg",
+    "title": "Original Artwork 11",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   },
   {
-    "image": "art/temp-12.svg",
-    "title": "The Open Road",
-    "description": "Original temporary illustration for BIPZILLAWORLD, inspired by Nepal's landscapes, colours and streets. Replace this piece with your own artwork whenever you like.",
-    "collection": "Valley Sketches"
+    "image": "art/12.jpg",
+    "fallback_image": "art/temp-12.svg",
+    "title": "Original Artwork 12",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/13.jpg",
+    "fallback_image": "art/temp-01.svg",
+    "title": "Original Artwork 13",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/14.jpg",
+    "fallback_image": "art/temp-02.svg",
+    "title": "Original Artwork 14",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/15.jpg",
+    "fallback_image": "art/temp-03.svg",
+    "title": "Original Artwork 15",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/16.jpg",
+    "fallback_image": "art/temp-04.svg",
+    "title": "Original Artwork 16",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/17.jpg",
+    "fallback_image": "art/temp-05.svg",
+    "title": "Original Artwork 17",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/18.jpg",
+    "fallback_image": "art/temp-06.svg",
+    "title": "Original Artwork 18",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
+  },
+  {
+    "image": "art/19.jpg",
+    "fallback_image": "art/temp-07.svg",
+    "title": "Original Artwork 19",
+    "description": "From the artist's original BIPZILLAWORLD uploads. Artwork title and story can be edited in the private artist studio.",
+    "collection": "Original Collection"
   }
 ]
