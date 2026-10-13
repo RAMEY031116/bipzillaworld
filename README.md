@@ -12,6 +12,12 @@
 
 **Performance:** shadows disabled in the scene manifest; mobile panorama downsampled; static architectural instancing and FAST/BALANCED/DETAIL remain. This has passed source-level syntax checks only, **not a deployed browser render, FPS benchmark, or headset test**.
 
+### Parallax / panorama realism update
+
+The viewer now blends the 360-degree panoramic horizon with additional **genuine 3D geometry outside the station**: two multi-ring docking structures, solar-panel spacecraft docks, a slowly orbiting satellite and hundreds of perspective-correct star points. These elements change their relative positions when the visitor moves, rather than being baked into the panorama. The panoramic texture is also wrapped with crossfaded left/right seam columns and darkened poles, which reduces abrupt stitch lines and the worst stretching overhead. Mobile uses a 2048×1024 panorama and a smaller star layer; desktop uses 4096×2048.
+
+**Important realism limitation:** the underlying panorama is still an image, and the camera cannot reveal true depth in the structures baked into that image. A fully photorealistic, parallax-correct 360-degree station requires custom textured 3D architecture (or multiple depth-mapped scenes), a matching HDR environment, and actual browser/device QA. These changes improve the hybrid effect but do not pretend to turn photographs into complete 3D geometry.
+
 ### Cinematic image + live 3D hybrid (October 2026)
 
 The user requested that the website resemble the generated cinematic space-station reference rather than a simple mobile-game-like dome. **A new hybrid mode is implemented in `index.html` and `app.py`:** the panoramic cinematic image is used as a lightweight, fixed distant backdrop while the museum architecture, 19 artwork frames, Nepal flags, floor and walk controls remain real Three.js objects. A small look-based parallax offset gives the image a subtle response when the camera rotates. This is deliberately a **2D image background + genuine 3D foreground**, not a fully navigable 3D model of everything in the photograph.
