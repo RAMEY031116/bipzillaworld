@@ -82,6 +82,15 @@ def museum():
         parsed.hostname in ("thumb.wikimedia.org", "upload.wikimedia.org")
     ):
         panorama["url"] = external
+    # Streamlit components.html runs in a separate iframe. Local relative image
+    # URLs there do not resolve to repository files; embed the optimized WebP.
+    backdrop_path = ROOT / "assets" / "orbital-cinematic.webp"
+    backdrop_data = ""
+    if backdrop_path.is_file():
+        backdrop_data = "data:image/webp;base64," + base64.b64encode(
+            backdrop_path.read_bytes()
+        ).decode("ascii")
+    html = html.replace("__CINEMATIC_BACKDROP__", json.dumps(backdrop_data))
     html = html.replace("__SCENE_CONFIG__", json.dumps(config).replace("</", "<\\/"))
     return html.replace("__ART_DATA__", json.dumps(works).replace("</", "<\\/"))
 
