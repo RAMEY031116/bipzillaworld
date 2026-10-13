@@ -46,6 +46,30 @@ function texture(kind){
 }
 function mat(hex,rough=.88,tex){return new T.MeshStandardMaterial({color:hex,roughness:rough,map:tex?texture(tex):null,side:T.FrontSide})}
 const M={brick:mat(0xffffff,.9,'brick'),stone:mat(0xffffff,.96,'stone'),wood:mat(0xffffff,.9,'wood'),roof:mat(0xffffff,.95,'roof'),dark:mat(0x261e1a),gold:mat(0xc59b52,.64),plaster:mat(0xdfc4a3),white:mat(0xf2ebe0),green:mat(0x738864),grass:mat(0x9da78a,.98,'earth'),water:new T.MeshStandardMaterial({color:0x5d9caa,roughness:.31,metalness:.05}),shade:mat(0x4e3429),red:mat(0x963a31)};
+
+/* Optional CC0 Poly Haven PBR surfaces. The scene remains playable offline. */
+const courtyardPavers=M.brick.clone();
+async function applyScannedSurface(material,id,{repeat=[1,1],normalStrength=.35}={}){
+ try{
+  const res=await fetch('https://api.polyhaven.com/files/'+encodeURIComponent(id));
+  if(!res.ok)throw Error('Poly Haven HTTP '+res.status);
+  const files=await res.json(),d=files.Diffuse?.['1k']?.jpg?.url;
+  if(!d)throw Error('Texture missing: '+id);
+  const loader=new T.TextureLoader(),color=await loader.loadAsync(d);
+  color.colorSpace=T.SRGBColorSpace;color.wrapS=color.wrapT=T.RepeatWrapping;
+  color.repeat.set(...repeat);color.anisotropy=2;
+  material.map=color;material.color.set(0xffffff);
+  const n=files.nor_gl?.['1k']?.jpg?.url;
+  if(n){try{const normal=await loader.loadAsync(n);normal.wrapS=normal.wrapT=T.RepeatWrapping;normal.repeat.set(...repeat);material.normalMap=normal;material.normalScale.set(normalStrength,normalStrength)}catch(e){console.warn('Normal map unavailable',id,e)}}
+  material.needsUpdate=true;
+ }catch(err){console.warn('Using lightweight fallback texture for '+id,err)}
+}
+applyScannedSurface(M.brick,'red_brick',{normalStrength:.23});
+applyScannedSurface(courtyardPavers,'red_brick_pavers',{repeat:[28,32],normalStrength:.32});
+applyScannedSurface(M.stone,'rock_ground',{normalStrength:.18});
+applyScannedSurface(M.wood,'dark_planks',{normalStrength:.15});
+applyScannedSurface(M.roof,'clay_roof_tiles',{normalStrength:.2});
+
 const UNIT=new T.BoxGeometry(1,1,1),pickables=[],colliders=[],landmarks=[];
 const fallbackModels=new Map();
 function sceneFallback(id,group){group.name='fallback-'+id;fallbackModels.set(id,group)}
@@ -66,7 +90,7 @@ function roof(g,y,width,depth,rise){
  }
  const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
  geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeVertexNormals();
- const roofMaterial=new T.MeshStandardMaterial({map:texture('roof'),color:0xb8aaa1,roughness:.91,side:T.DoubleSide});
+ const roofMaterial=M.roof;
  const roofMesh=new T.Mesh(geo,roofMaterial);roofMesh.castShadow=true;roofMesh.receiveShadow=true;g.add(roofMesh);
  // Eaves, copper/wood ridge edges and diagonal supports
  for(const side of [-1,1]){
@@ -244,7 +268,7 @@ function courtyardDetails(){
 // A small curated world; no procedurally duplicated rooms or dozens of lights.
 plane(0,-75,410,390,M.grass,-.18);
 plane(0,-12,107,125,M.stone,.035);
-plane(0,-12,104,121,M.brick,.04);
+plane(0,-12,104,121,courtyardPavers,.04);
 // Receive soft contact shadows without adding any extra lighting passes.
 for(const child of scene.children)if(child.isMesh&&child.geometry?.type==='PlaneGeometry'&&child.rotation.x< -1.5)child.receiveShadow=true;
 // A single instanced draw call instead of individual paving detail meshes.
