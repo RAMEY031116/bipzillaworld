@@ -1526,7 +1526,9 @@ function setPhotoMode(enabled){
  // Only one Earth in the entire view: a genuine rotating textured globe.
  // The older photo collage contained multiple baked-in planets.
  planet.visible=true;
- moon.visible=!enabled;
+ // Keep the separate ringed gas giant visible in cinematic mode: it is
+ // not a second Earth and gives visitors another real 3D celestial body.
+ moon.visible=true;
  distantSun.visible=true;
  stars.visible=!enabled;
  debris.visible=false;
@@ -1534,7 +1536,7 @@ function setPhotoMode(enabled){
  for(const sprite of scene.children.filter(o=>o.isSprite))sprite.visible=!enabled;
  backdropToggle.textContent=enabled?'↻ SINGLE EARTH: ON':'↻ SINGLE EARTH: OFF';
  backdropNote.textContent=enabled
-  ?'360° continuous sky · one real 3D Earth'
+  ?'360° continuous sky · one Earth and a ringed gas giant'
   :'Original real-time 3D space scenery'
 }
 backdropToggle.onclick=()=>{
@@ -1545,7 +1547,7 @@ backdropToggle.onclick=()=>{
 // Start with a continuous deep-space sky and a SINGLE actual 3D Earth instead.
 buildCleanSpacePanorama();
 photoReady=true;setPhotoMode(true);
-backdropNote.textContent='Single Earth · seamless 360° space · real 3D station';
+backdropNote.textContent='One Earth · ringed planet · seamless 360° space';
 // Real depth layer beyond the station windows. The panorama is only the
 // farthest horizon; all of these objects have perspective and parallax as you
 // walk. Their positions are in the same coordinate system as the gallery.
