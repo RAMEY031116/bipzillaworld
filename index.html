@@ -25,6 +25,16 @@ const ART=await (async()=>{try{return __ART_DATA__}catch(e){
  const response=await fetch('./artworks.json');if(!response.ok)throw Error('Artwork manifest missing');
  return response.json()
 }})();
+// Standalone viewer uses the same nineteen original uploaded images as
+// Streamlit, without requiring separate binary files in art/.
+if(ART.some(a=>a.image&&!a.image.startsWith('data:'))){
+ try{
+  const r=await fetch('./art/originals.json');
+  if(r.ok){const originals=await r.json();
+   for(const a of ART){if(originals[a.image])a.image=originals[a.image]}
+  }
+ }catch(e){console.info('Original artwork pack unavailable; using fallbacks',e)}
+}
 const SCENE_ASSETS=await (async()=>{try{return __SCENE_CONFIG__}catch(e){
  const response=await fetch('./scene-assets.json');if(!response.ok)return {};
  return response.json()
