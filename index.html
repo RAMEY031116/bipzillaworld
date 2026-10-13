@@ -1088,6 +1088,7 @@ lens.position.set(0,5.47,-1.4);lens.rotation.x=-Math.PI*.32;telescope.add(lens);
 // Optional image-backed cinematic exterior. The photograph supplies distant
 // scenery only: floor, walls, paintings, Nepal flags and walking remain true 3D.
 // File is intentionally loaded separately for caching and fast mobile startup.
+const PHOTO_SOURCE=await (async()=>{try{return __CINEMATIC_BACKDROP__}catch(e){return 'assets/orbital-cinematic.webp'}})();
 const cinematicSky=$('cinematic-sky');
 const backdropToggle=$('backdrop-toggle');
 const backdropNote=$('backdrop-note');
@@ -1097,7 +1098,7 @@ const photoBackdrop=new Image();
 photoBackdrop.decoding='async';
 photoBackdrop.onload=()=>{
  photoReady=true;
- cinematicSky.style.backgroundImage='url("assets/orbital-cinematic.webp")';
+ cinematicSky.style.backgroundImage=`url("${PHOTO_SOURCE}")`;
  backdropNote.textContent='Photo scenery + interactive 3D museum';
  setPhotoMode(true)
 };
@@ -1106,7 +1107,7 @@ photoBackdrop.onerror=()=>{
  backdropToggle.textContent='✦ ADD PHOTO BACKDROP';
  backdropToggle.title='Upload assets/orbital-cinematic.webp to activate this mode'
 };
-photoBackdrop.src='assets/orbital-cinematic.webp';
+photoBackdrop.src=PHOTO_SOURCE;
 function setPhotoMode(enabled){
  if(enabled&&!photoReady)return;
  photoEnabled=enabled;
