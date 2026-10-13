@@ -2,6 +2,15 @@
 
 **Status:** Preparation underway. The 3D scene currently uses procedural placeholders for the arrival gate, pagodas and cliff. None should be represented as a finished realistic asset.
 
+## Courtyard composition pass — 13 October 2026
+
+**Committed to `index.html`:** sheltered museum cloisters along the east/west court edges, deeper display bays, column and arch rhythm, dark timber entrance lattice, carved bronze-like details, two flanking earthen embankments, a stronger stone courtyard boundary and broken-up paving. The landing page now says **Hidden Himalayan Museum**.
+
+**Honest status:** These additions increase compositional depth but are **still procedural meshes**. They do not substitute for commissioned/licensed, detailed pagoda and gate GLBs. No browser visual or FPS check has been performed. The first live screenshot is the next required review.
+
+**Known risks to test:** courtyard walkway and art panels must remain visible from the new spawn; gate and cloister columns should not clip camera; positioning near two embankments; source attribution links; imported shrine asset's remote accessibility.
+
+
 ## October 2026 active integration update
 
 A **real low-poly photogrammetry Patan chaitya** (Semantic Creation / NepalVR360, via [Zenodo record 10293668](https://zenodo.org/records/10293668), CC BY) is now configured as an **optional external 3D asset** at the arrival-courtyard edge. The viewer normalizes its size to ~3.8 world metres. If Zenodo blocks CORS or changes its download path, loading will fail gracefully and the rest of the world remains usable. Confirm licensing and attribution against the original record before production promotion.
