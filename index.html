@@ -34,8 +34,11 @@ function showFallback(message){$('intro').style.display='none';$('fallback').sty
 let T;try{T=await import('three')}catch(err){console.error(err);showFallback('The 3D library could not load. Here is your art gallery.');throw err}
 let renderer;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch(err){showFallback('This browser cannot display WebGL. Your artwork is still available.');throw err}
 const visualQuality=SCENE_ASSETS.quality||{};
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, visualQuality.maxPixelRatio||1.25));
-renderer.shadowMap.enabled=visualQuality.shadows!==false;
+const isMobileDevice=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||innerWidth<800;
+const qualityLevels=[.65,.9,1.2];let qualityIndex=isMobileDevice?0:1;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,qualityLevels[qualityIndex]));
+// High shadow-map cost was the main source of mobile stalls.
+renderer.shadowMap.enabled=visualQuality.shadows===true;
 renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;document.body.prepend(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color(0xb5cddd);scene.fog=new T.Fog(0xb5cddd,170,510);
 const camera=new T.PerspectiveCamera(69,innerWidth/innerHeight,.08,650);
@@ -573,10 +576,14 @@ function hallArchitecture(){
  for(let z=-48;z<8;z+=12){
   for(const x of [-23,23]){
    box(hall,x,12.6,z,.15,.1,3.7,brass);
-   const lamp=new T.SpotLight(0xffddba,9,18,Math.PI/5,.6,1.4);
-   lamp.position.set(x,12,z);lamp.target.position.set(x,1.3,z-2);
-   hall.add(lamp,lamp.target)
+   // Emissive strips simulate exhibition lighting without ten expensive
+   // per-fragment spotlights on every visible object.
+   box(hall,x,12.49,z,.11,.055,3.4,ledWarm);
   }
+ }
+ for(const x of [-18,18]){
+  const lamp=new T.PointLight(0xffd6a3,7,26,2);
+  lamp.position.set(x,9,-20);hall.add(lamp)
  }
  // Inlaid marble rings and gold outlines around the holographic globe.
  for(let radius of [10.5,12.7,16.2,22]){
@@ -997,6 +1004,39 @@ for(const p of artPositions){
  box(frame,0,2.4,-.22,4.35,4.55,.12,edge);
  box(frame,0,5.0,-.34,5.0,.12,.22,glow);
 }
+// Batch static architecture boxes into instanced draw calls. This changes
+// rendering only; original art planes stay independent for click inspection.
+function batchStaticBoxes(){
+ scene.updateMatrixWorld(true);
+ const batches=new Map(),remove=[];
+ const ignored=new Set([core,probe,debris,planet,moon,distantSun]);
+ function visit(node,insideDynamic=false){
+  const dynamic=insideDynamic||ignored.has(node);
+  if(!dynamic&&node.isMesh&&node.geometry===UNIT&&!node.userData?.art&&
+      !node.material.transparent&&!node.material.alphaTest){
+   const key=node.material.uuid;
+   if(!batches.has(key))batches.set(key,{material:node.material,matrices:[]});
+   batches.get(key).matrices.push(node.matrixWorld.clone());remove.push(node)
+  }
+  for(const child of [...node.children])visit(child,dynamic)
+ }
+ visit(scene);
+ for(const mesh of remove)mesh.parent.remove(mesh);
+ for(const {material,matrices} of batches.values()){
+  if(matrices.length<2){
+   // A single object is still cheap; keep its world transform.
+   const m=new T.Mesh(UNIT,material);m.matrixAutoUpdate=false;
+   m.matrix.copy(matrices[0]);scene.add(m);continue
+  }
+  const mesh=new T.InstancedMesh(UNIT,material,matrices.length);
+  for(let i=0;i<matrices.length;i++)mesh.setMatrixAt(i,matrices[i]);
+  mesh.instanceMatrix.needsUpdate=true;mesh.frustumCulled=false;
+  mesh.castShadow=false;mesh.receiveShadow=false;scene.add(mesh)
+ }
+ console.info('Architecture optimized:',remove.length,'boxes into',batches.size,'batches')
+}
+batchStaticBoxes();
+
 // Keep old imported Nepal assets and photographic panorama disabled in orbital mode.
 const ORBITAL_MODE=true;
 // Asset-based rendering: a real GLB replaces each procedural fallback only AFTER loading.
