@@ -709,6 +709,9 @@ function hallArchitecture(){
  leafGeo.setIndex(leafIndices);leafGeo.computeVertexNormals();
  const locations=[];
  for(const x of [-25.5,25.5])for(const z of [0,-16,-33,-47])locations.push([x,z]);
+ // Botanical pockets in the west/east observation wings and planetary overlook.
+ for(const x of [-86,-62,62,86])locations.push([x,-18]);
+ for(const x of [-12,12])locations.push([x,-108]);
  // One shared material, and predictable leaf positions (no frame-time randomness).
  const leafCount=locations.length*8*9;
  const leafMesh=new T.InstancedMesh(leafGeo,leafMat,leafCount);
