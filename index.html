@@ -781,10 +781,10 @@ function stationPanelTexture(){
 }
 const hullPanelTexture=stationPanelTexture();
 const panelMetal=new T.MeshStandardMaterial({
- map:hullPanelTexture,metalness:.62,roughness:.37,color:0xbac6d0
+ map:hullPanelTexture,bumpMap:hullPanelTexture,bumpScale:.075,metalness:.62,roughness:.37,color:0xbac6d0
 });
 const darkPanelMetal=new T.MeshStandardMaterial({
- map:hullPanelTexture,metalness:.72,roughness:.4,color:0x788b9f
+ map:hullPanelTexture,bumpMap:hullPanelTexture,bumpScale:.06,metalness:.72,roughness:.4,color:0x788b9f
 });
 const neonStrip=new T.MeshBasicMaterial({color:0xa3d9ff});
 const observationShell=new T.Group();scene.add(observationShell);
@@ -1068,6 +1068,28 @@ loadSurfaceWithFallback([
  world.material.needsUpdate=true;
  console.info('Photographic Earth surface loaded')
 });
+// Geographic relief catches light on mountain ranges and coastlines.
+// It is a subtle normal-map effect, not extra geometry or another Earth.
+satelliteTextures.load(
+ 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_normal_2048.jpg',
+ texture=>{
+  texture.colorSpace=T.NoColorSpace;
+  world.material.normalMap=texture;
+  world.material.normalScale.set(.20,.20);
+  world.material.needsUpdate=true
+ },undefined,()=>console.info('Earth normal map unavailable; retaining satellite colour map')
+);
+// A bump texture adds a second fallback for browsers that cannot load normals.
+satelliteTextures.load(
+ 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_bump_2048.jpg',
+ texture=>{
+  texture.colorSpace=T.NoColorSpace;
+  if(!world.material.normalMap){
+   world.material.bumpMap=texture;world.material.bumpScale=.16;
+   world.material.needsUpdate=true
+  }else texture.dispose()
+ },undefined,()=>{}
+);
 satelliteTextures.load(
  'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_clouds_1024.png',
  texture=>{
