@@ -1,26 +1,26 @@
 {
   "version": 3,
-  "notes": "The active index.html scene is a walkable orbital art museum. Former Nepalese assets are retained as archival configuration but disabled. Add space GLB assets only after changing the orbital loader configuration.",
+  "notes": "Active scene: 360-degree image-backed orbital station with walkable Three.js foreground, Nepal flags, and 19 original artwork images. Panorama is four artistically stitched AI concept views, not a captured equirectangular 360 photograph. Mobile uses reduced resolution and shadows off.",
   "models": [],
   "panorama": {
     "file": "",
     "external_url": ""
   },
   "quality": {
-    "shadows": true,
-    "maxPixelRatio": 1.25,
+    "shadows": false,
+    "maxPixelRatio": 0.95,
     "shadowMapSize": 1024,
     "farView": 520
   },
-  "phase": "orbital-first-release",
+  "phase": "cinematic-360-orbital-museum",
   "phase1": {
     "status": "space-museum-live-code-committed",
     "areas": [
-      "Orbital Arrival",
+      "Earth Observation Hall",
       "Nebula Gallery",
       "Planetary Overlook"
     ],
-    "artworks": 12
+    "artworks": 19
   },
   "theme": "orbital-space-museum",
   "archivedNepalAssets": {
