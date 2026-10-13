@@ -528,9 +528,9 @@ const brass=new T.MeshStandardMaterial({color:0xb99464,metalness:.94,roughness:.
 const velvet=new T.MeshStandardMaterial({color:0x102331,metalness:.08,roughness:.85});
 const ledWarm=new T.MeshBasicMaterial({color:0xffd19a});
 const ledCool=new T.MeshBasicMaterial({color:0x6bd7ff});
-const windowGlass=new T.MeshPhysicalMaterial({
- color:0x9bc5ec,transparent:true,opacity:.055,roughness:.035,
- metalness:0,side:T.DoubleSide,depthWrite:false
+const windowGlass=new T.MeshBasicMaterial({
+ color:0x7e9ab2,transparent:true,opacity:.025,
+ side:T.DoubleSide,depthWrite:false
 });
 function tube(g,points,radius,material){
  const curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)));
@@ -659,7 +659,7 @@ for(const z of [41,29,17,5,-7,-19,-31,-43,-55,-67,-79,-91,-103,-115]){
     box(station,x,6.6,z,1.25,.3,1.5,edge);
   }
 }
-const dome=new T.Mesh(new T.SphereGeometry(29,56,24,0,Math.PI*2,0,Math.PI/2),glass);
+const dome=new T.Mesh(new T.SphereGeometry(29,48,18,0,Math.PI*2,0,Math.PI/2),windowGlass);
 dome.position.set(0,1,-24);station.add(dome);
 torus(station,0,1,-24,29,.65,metal);
 torus(station,0,1.25,-24,27.9,.10,edge);
@@ -815,7 +815,7 @@ const cloudTexture=surfaceTexture('clouds');
 const moonTexture=surfaceTexture('rock',isMobileDevice?256:512,isMobileDevice?128:256);
 
 // A large blue planetary horizon, visibly spherical with subtle clouds.
-const planet=new T.Group();planet.position.set(60,-46,-212);planet.rotation.z=.08;planet.scale.setScalar(1.26);scene.add(planet);
+const planet=new T.Group();planet.position.set(30,-29,-236);planet.rotation.z=.08;planet.scale.setScalar(1.36);scene.add(planet);
 const world=new T.Mesh(new T.SphereGeometry(94,96,64),new T.MeshStandardMaterial({map:oceanTexture,roughness:.86,metalness:0,emissive:0x061426,emissiveIntensity:.10}));planet.add(world);
 const cloudShell=new T.Mesh(new T.SphereGeometry(95.3,80,48),new T.MeshStandardMaterial({map:cloudTexture,transparent:true,opacity:.64,roughness:1,depthWrite:false,side:T.FrontSide}));
 planet.add(cloudShell);
@@ -1101,7 +1101,7 @@ async function loadExternalSceneAssets(){
 if(!ORBITAL_MODE)loadExternalSceneAssets();
 
 const ray=new T.Raycaster();const keys={};let active=false,modal=false,dragging=false,yaw=0,pitch=0,downX=0,downY=0,last=performance.now(),zone=0;
-const spawns=[{x:0,z:59,y:2.1,title:'Orbital Arrival',area:'BIPZILLA STATION',yaw:0},{x:-74,z:-35,y:2.1,title:'Nebula Gallery',area:'WEST OBSERVATORY',yaw:-1.1},{x:0,z:-119,y:2.1,title:'Planetary Overlook',area:'DEEP SPACE',yaw:0}];
+const spawns=[{x:0,z:-3,y:2.1,title:'Earth Observation Hall',area:'NEPAL ORBITAL MUSEUM',yaw:0},{x:-74,z:-35,y:2.1,title:'Nebula Gallery',area:'WEST OBSERVATORY',yaw:-1.1},{x:0,z:-119,y:2.1,title:'Planetary Overlook',area:'DEEP SPACE',yaw:0}];
 function notice(s){let t=$('toast');t.textContent=s;t.style.opacity=1;clearTimeout(notice.timer);notice.timer=setTimeout(()=>t.style.opacity=0,2300)}
 function teleport(i){zone=i;const p=spawns[i];camera.position.set(p.x,p.y,p.z);yaw=p.yaw;pitch=0;$('spot').textContent=p.title;$('area').textContent=p.area;document.querySelectorAll('[data-zone]').forEach((b,j)=>b.classList.toggle('active',i===j));notice(p.title)}
 function inspect(){ray.setFromCamera(new T.Vector2(0,0),camera);const hits=ray.intersectObjects(pickables);if(!hits.length||hits[0].distance>10)return;const a=hits[0].object.userData.art;$('title').textContent=a.title||'Artwork';$('description').textContent=a.description||'From the BIPZILLAWORLD art collection';$('photo').innerHTML='';const im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Artwork';$('photo').append(im);$('modal').style.display='flex';modal=true}
