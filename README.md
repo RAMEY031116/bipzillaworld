@@ -2,6 +2,12 @@
 
 ## Kathmandu temple-square rebuild (current)
 
+### Rendering pass — October 2026
+
+The Kathmandu scene now uses UV-mapped procedural roof surfaces, thicker roof supports, instanced pagoda relief details, triangulated Himalayan ridge terrain with depth and snow/rock shading, and instanced paving pieces. This remains a stylised semi-realistic WebGL prototype: full realistic architecture would benefit from licensed/created GLB models and higher-quality PBR materials. The existing Streamlit artist dashboard and 12 temporary artworks are unchanged. JavaScript syntax was checked before committing; real-browser performance and visual fidelity are **not** yet verified.
+
+
+
 The main museum scene has been rebuilt around a **compact 3D Kathmandu-inspired courtyard**, with:
 - Three multi-tier pagoda temples made from sloping roof meshes, timber eaves and masonry bases
 - Procedurally textured brick, roof shingles, wood and stone (generated locally in the browser; no large external texture downloads)
