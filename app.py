@@ -31,13 +31,18 @@ def museum():
     works = []
     for item in raw:
         w = dict(item)
-        p = Path(str(w.get("image", "")))
+        # Original artwork takes priority. While binary images are being
+        # uploaded to GitHub, preserve a visible temporary fallback.
+        primary = Path(str(w.get("image", "")))
+        fallback = Path(str(w.get("fallback_image", "")))
         w["image"] = ""
-        if p.parts and not p.is_absolute() and ".." not in p.parts:
-            target = ROOT / p
-            if target.is_file():
-                mime = mimetypes.guess_type(target.name)[0] or "image/jpeg"
-                w["image"] = "data:" + mime + ";base64," + base64.b64encode(target.read_bytes()).decode("ascii")
+        for p in (primary, fallback):
+            if p.parts and not p.is_absolute() and ".." not in p.parts:
+                target = ROOT / p
+                if target.is_file():
+                    mime = mimetypes.guess_type(target.name)[0] or "image/jpeg"
+                    w["image"] = "data:" + mime + ";base64," + base64.b64encode(target.read_bytes()).decode("ascii")
+                    break
         works.append(w)
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     config = json.loads((ROOT / "scene-assets.json").read_text(encoding="utf-8"))
