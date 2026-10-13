@@ -105,6 +105,23 @@
       "rotationY": 0,
       "scale": 1,
       "castShadow": false
+    },
+    {
+      "id": "patan-chaitya-real-scan",
+      "file": "",
+      "external_url": "https://zenodo.org/records/10293668/files/1f5bf7002a1341d4aa7d417f54178b8d.glb?download=1",
+      "position": [
+        -22,
+        0,
+        27
+      ],
+      "rotationY": 1.15,
+      "scale": 1,
+      "targetHeight": 3.8,
+      "castShadow": true,
+      "source": "https://zenodo.org/records/10293668",
+      "license": "CC BY 4.0",
+      "credit": "Semantic Creation / NepalVR360"
     }
   ],
   "panorama": {
@@ -145,6 +162,6 @@
       "entryTimeSeconds": 3,
       "quality": "first view must look architectural not blockout"
     },
-    "status": "preparation-in-progress"
+    "status": "live-vertical-slice-in-progress"
   }
 }
