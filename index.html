@@ -83,11 +83,11 @@ async function applyScannedSurface(material,id,{repeat=[1,1],normalStrength=.35}
   material.needsUpdate=true;
  }catch(err){console.warn('Using lightweight fallback texture for '+id,err)}
 }
-applyScannedSurface(M.brick,'red_brick',{normalStrength:.23});
-applyScannedSurface(courtyardPavers,'red_brick_pavers',{repeat:[28,32],normalStrength:.32});
-applyScannedSurface(M.stone,'rock_ground',{normalStrength:.18});
-applyScannedSurface(M.wood,'dark_planks',{normalStrength:.15});
-applyScannedSurface(M.roof,'clay_roof_tiles',{normalStrength:.2});
+// Archived Nepal-only material download disabled for orbital museum: applyScannedSurface(M.brick,'red_brick',{normalStrength:.23});
+// Archived Nepal-only material download disabled for orbital museum: applyScannedSurface(courtyardPavers,'red_brick_pavers',{repeat:[28,32],normalStrength:.32});
+// Archived Nepal-only material download disabled for orbital museum: applyScannedSurface(M.stone,'rock_ground',{normalStrength:.18});
+// Archived Nepal-only material download disabled for orbital museum: applyScannedSurface(M.wood,'dark_planks',{normalStrength:.15});
+// Archived Nepal-only material download disabled for orbital museum: applyScannedSurface(M.roof,'clay_roof_tiles',{normalStrength:.2});
 
 const UNIT=new T.BoxGeometry(1,1,1),pickables=[],colliders=[],landmarks=[];
 const fallbackModels=new Map();
@@ -695,7 +695,7 @@ const lamp=new T.PointLight(0x59cfff,45,55,2);lamp.position.set(0,11,-22);scene.
 let seed=14719;const rand=()=>((seed=(1664525*seed+1013904223)>>>0)/4294967296);
 const starPos=[],starSize=[],starTint=[],starPhase=[];
 const cold=new T.Color(0xaec9ff),warm=new T.Color(0xffdbad),white=new T.Color(0xffffff);
-for(let i=0;i<5100;i++){
+for(let i=0;i<(isMobileDevice?2400:4400);i++){
  const u=rand()*Math.PI*2,v=Math.acos(2*rand()-1),r=310+rand()*240;
  starPos.push(Math.sin(v)*Math.cos(u)*r,Math.cos(v)*r,Math.sin(v)*Math.sin(u)*r);
  starSize.push(rand()<.025?3.2+rand()*2.8:.7+rand()*1.65);
@@ -734,11 +734,11 @@ const stars=new T.Points(starsGeo,new T.ShaderMaterial({
 }));scene.add(stars);
 // Cloudlike nebulae are distant translucent volume impressions, not opaque billboards.
 function nebulaSprite(cx,cy,cz,size,colors){
- const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;
+ const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;
  const ctx=canvas.getContext('2d');
  for(let i=0;i<48;i++){
-   const x=256+(rand()-.5)*270,y=256+(rand()-.5)*200;
-   const r=35+rand()*115;
+   const x=128+(rand()-.5)*135,y=128+(rand()-.5)*100;
+   const r=18+rand()*58;
    const gradient=ctx.createRadialGradient(x,y,0,x,y,r);
    const col=colors[i%colors.length];
    gradient.addColorStop(0,col);gradient.addColorStop(.45,col.replace(/[\d.]+\)$/,'0.055)'));gradient.addColorStop(1,'rgba(0,0,0,0)');
@@ -768,7 +768,7 @@ function fbm(x,y,seedValue){
  for(let o=0;o<5;o++){sum+=amp*smoothNoise(x*frequency,y*frequency,seedValue+o*17);frequency*=2;amp*=.49}
  return sum
 }
-function surfaceTexture(kind,w=768,h=384){
+function surfaceTexture(kind,w=isMobileDevice?384:640,h=isMobileDevice?192:320){
  const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
  const ctx=canvas.getContext('2d'),pixels=ctx.createImageData(w,h),p=pixels.data;
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
@@ -812,7 +812,7 @@ inner.material=new T.MeshStandardMaterial({
  map:oceanTexture,roughness:.27,metalness:.05,emissive:0x142d4c,emissiveIntensity:.32
 });
 const cloudTexture=surfaceTexture('clouds');
-const moonTexture=surfaceTexture('rock',512,256);
+const moonTexture=surfaceTexture('rock',isMobileDevice?256:512,isMobileDevice?128:256);
 
 // A large blue planetary horizon, visibly spherical with subtle clouds.
 const planet=new T.Group();planet.position.set(60,-46,-212);planet.rotation.z=.08;planet.scale.setScalar(1.26);scene.add(planet);
