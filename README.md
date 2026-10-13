@@ -12,6 +12,14 @@
 
 **Performance:** shadows disabled in the scene manifest; mobile panorama downsampled; static architectural instancing and FAST/BALANCED/DETAIL remain. This has passed source-level syntax checks only, **not a deployed browser render, FPS benchmark, or headset test**.
 
+### Mobile-first museum, interactive art focus and visual polish — October 2026
+
+The museum has a responsive, touch-friendly UI: larger directional buttons, compact quality and panorama controls, clearer navigation tabs, improved modal layouts on small screens, and touch drag-to-look using pointer coordinates rather than unreliable `movementX/movementY` on phones. VR headset setup has been deferred; desktop fullscreen remains available.
+
+Artwork interaction now raycasts **at the actual tap/click position**, rather than only the centre reticle. Selecting a visible artwork within range smoothly pans and moves the camera toward it (where the gallery walkway permits), then opens a larger image inspection panel. The panel has **Previous / Next**, an artwork counter, Escape-to-close, and keyboard arrow navigation. The original image is displayed without cropping, with a fallback where supplied. Gallery frames have added brass depth, warm upper trim and individually rendered title/number labels. A redundant second layer of frame geometry was removed for performance. The clean single-Earth sky no longer restores floating asteroids when changing graphics quality.
+
+**QA:** JavaScript syntax verified and gallery/admin assets preserved. Visual browser testing, touch-device testing, and frame-rate measurements remain pending. Existing NASA texture downloads can fail in restricted networks; the procedural Earth texture remains a fallback.
+
 ### Walkable architectural realism — October 2026
 
 The next upgrade adds genuine textured Three.js architecture to the panoramic museum, rather than trying to simulate the whole station with more pictures. A tiled, metallic floor overlay has panel joints and brass inlays; the two side observatories now have three-dimensional bulkheads, observation-window framing, illuminated metalwork and external sightlines; four interactive-area control consoles sit near the main gallery windows. The additional panels share geometry and materials, so the existing instancing pass can batch many of them. The 360-degree image is retained as the distant exterior only.
