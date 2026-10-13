@@ -20,6 +20,16 @@ QA: JavaScript syntax and repository references checked. Live rendering, mobile 
 
 **Performance:** shadows disabled in the scene manifest; mobile panorama downsampled; static architectural instancing and FAST/BALANCED/DETAIL remain. This has passed source-level syntax checks only, **not a deployed browser render, FPS benchmark, or headset test**.
 
+### Detail-only planetary and botanical polish — October 2026
+
+The museum's quality control is **locked to DETAIL**, with no automatic fallback to Balanced or Fast. To avoid returning to the earlier lag, rendering still caps device pixel ratio at 1.5 and disables expensive shadow-map effects when configured off. Detail mode means the detailed scene stays enabled, not an unlimited GPU workload.
+
+The observation hall, both side wings and planetary overlook now contain 14 botanical planters. Spherical plastic-looking foliage has been replaced with hundreds of individually oriented, curved lance-shaped leaves and tapered stems using GPU instancing; each planter includes mineral soil, scattered grit, and a metallic rim. The station's existing panel textures gain subtle bump relief.
+
+The 3D Earth uses real satellite surface photography where available, with optional relief/normal maps, moving clouds, night-side city lights and atmospheric limb glow. The distinct ringed gas giant remains visible alongside Earth in cinematic 360° mode. The seamless panorama adds a dim Milky Way dust lane and thousands of extra stars, without adding another copy of Earth.
+
+**Testing:** JavaScript syntax checked. Actual browser visuals, image CDN availability, and mobile frame rates still require device testing.
+
 ### Mobile-first museum, interactive art focus and visual polish — October 2026
 
 The museum has a responsive, touch-friendly UI: larger directional buttons, compact quality and panorama controls, clearer navigation tabs, improved modal layouts on small screens, and touch drag-to-look using pointer coordinates rather than unreliable `movementX/movementY` on phones. VR headset setup has been deferred; desktop fullscreen remains available.
