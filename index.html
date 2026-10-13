@@ -1088,7 +1088,14 @@ lens.position.set(0,5.47,-1.4);lens.rotation.x=-Math.PI*.32;telescope.add(lens);
 // Optional image-backed cinematic exterior. The photograph supplies distant
 // scenery only: floor, walls, paintings, Nepal flags and walking remain true 3D.
 // File is intentionally loaded separately for caching and fast mobile startup.
-const PHOTO_SOURCE=await (async()=>{try{return __CINEMATIC_BACKDROP__}catch(e){return 'assets/orbital-cinematic.webp'}})();
+const PHOTO_SOURCE=await (async()=>{
+ try{const injected=__CINEMATIC_BACKDROP__;if(injected)return injected}catch(e){}
+ try{
+  const response=await fetch('./assets/orbital-cinematic.b64');
+  if(response.ok)return 'data:image/webp;base64,'+(await response.text()).trim()
+ }catch(e){}
+ return 'assets/orbital-cinematic.webp'
+})();
 const cinematicSky=$('cinematic-sky');
 const backdropToggle=$('backdrop-toggle');
 const backdropNote=$('backdrop-note');
@@ -1103,9 +1110,9 @@ photoBackdrop.onload=()=>{
  setPhotoMode(true)
 };
 photoBackdrop.onerror=()=>{
- backdropNote.textContent='3D space active · photo file not installed';
+ backdropNote.textContent='3D space active · cinematic asset unavailable';
  backdropToggle.textContent='✦ ADD PHOTO BACKDROP';
- backdropToggle.title='Upload assets/orbital-cinematic.webp to activate this mode'
+ backdropToggle.title='Cinematic asset unavailable on this deployment'
 };
 photoBackdrop.src=PHOTO_SOURCE;
 function setPhotoMode(enabled){
@@ -1120,7 +1127,7 @@ function setPhotoMode(enabled){
  backdropNote.textContent=enabled?'Walkable 3D foreground · cinematic image outside':'Fully 3D outer-space background'
 }
 backdropToggle.onclick=()=>{
- if(!photoReady){notice('Upload assets/orbital-cinematic.webp to enable photo scenery');return}
+ if(!photoReady){notice('Cinematic asset unavailable; try refreshing after redeployment');return}
  setPhotoMode(!photoEnabled)
 };
 
