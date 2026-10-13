@@ -1230,6 +1230,46 @@ function loadImage(url){
   image.onload=()=>resolve(image);image.onerror=reject;image.src=url
  })
 }
+// A clean single-Earth exterior replaces the old stitched panorama, which
+// baked several different Earths into its four photographic quadrants.
+function buildCleanSpacePanorama(){
+ if(panoramaMesh){
+  scene.remove(panoramaMesh);panoramaMesh.geometry.dispose();
+  panoramaMesh.material.dispose();panoramaTexture.dispose()
+ }
+ const W=isMobileDevice?2048:4096,H=W/2;
+ const c=document.createElement('canvas');c.width=W;c.height=H;
+ const g=c.getContext('2d',{alpha:false});
+ const bg=g.createLinearGradient(0,0,0,H);
+ bg.addColorStop(0,'#01030b');bg.addColorStop(.48,'#050d1b');
+ bg.addColorStop(.72,'#09182c');bg.addColorStop(1,'#02040c');
+ g.fillStyle=bg;g.fillRect(0,0,W,H);
+ // Dim nebula clouds are far-away lighting, not additional planets.
+ const cloud=(x,y,r,color)=>{
+  const grad=g.createRadialGradient(x,y,0,x,y,r);
+  grad.addColorStop(0,color);grad.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=grad;g.beginPath();g.ellipse(x,y,r,r*.38,-.15,0,Math.PI*2);g.fill()
+ };
+ cloud(W*.2,H*.48,W*.25,'rgba(32,67,116,.22)');
+ cloud(W*.71,H*.38,W*.32,'rgba(63,37,112,.17)');
+ cloud(W*.95,H*.62,W*.18,'rgba(18,81,123,.15)');
+ let seed=1977;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ for(let i=0;i<(isMobileDevice?1550:2800);i++){
+  const x=rand()*W,y=rand()*H;
+  const r=rand()>.98?1.55:.3+rand()*.62;
+  g.fillStyle=rand()>.83?'rgba(175,211,255,.7)':'rgba(245,248,255,.54)';
+  g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.fill()
+ }
+ const tx=new T.CanvasTexture(c);
+ tx.colorSpace=T.SRGBColorSpace;tx.minFilter=T.LinearFilter;
+ tx.magFilter=T.LinearFilter;tx.generateMipmaps=false;
+ tx.wrapS=T.RepeatWrapping;
+ const mesh=new T.Mesh(new T.SphereGeometry(430,48,28),
+  new T.MeshBasicMaterial({map:tx,side:T.BackSide,depthWrite:false,fog:false}));
+ mesh.renderOrder=-1000;mesh.frustumCulled=false;
+ scene.add(mesh);panoramaMesh=mesh;panoramaTexture=tx;panoramaIs360=true
+}
+
 function buildPanorama(image,is360){
  if(panoramaMesh){
   scene.remove(panoramaMesh);panoramaMesh.geometry.dispose();
@@ -1301,31 +1341,29 @@ function setPhotoMode(enabled){
  scene.background=enabled?new T.Color(0x030713):spaceBackground;
  scene.fog=enabled?null:spaceFog;
  if(panoramaMesh)panoramaMesh.visible=enabled;
- for(const o of [planet,moon,distantSun,stars,debris,probe])o.visible=!enabled;
+ // Only one Earth in the entire view: a genuine rotating textured globe.
+ // The older photo collage contained multiple baked-in planets.
+ planet.visible=true;
+ moon.visible=!enabled;
+ distantSun.visible=true;
+ stars.visible=!enabled;
+ debris.visible=false;
+ probe.visible=!enabled;
  for(const sprite of scene.children.filter(o=>o.isSprite))sprite.visible=!enabled;
- backdropToggle.textContent=enabled?'↻ 360° PANORAMA: ON':'↻ 360° PANORAMA: OFF';
+ backdropToggle.textContent=enabled?'↻ SINGLE EARTH: ON':'↻ SINGLE EARTH: OFF';
  backdropNote.textContent=enabled
-  ?(panoramaIs360?'360° view · turn to see different sides':'360° look · mirrored single photo')
+  ?'360° continuous sky · one real 3D Earth'
   :'Original real-time 3D space scenery'
 }
 backdropToggle.onclick=()=>{
  if(!photoReady){notice('360° image still loading');return}
  setPhotoMode(!photoEnabled)
 };
-// Prefer four-perspective panoramic art; keep older photo as a fallback.
-loadImage(PANORAMA_SOURCE).then(image=>{
- buildPanorama(image,true);photoReady=true;setPhotoMode(true);
- backdropNote.textContent='360° image installed · turn left or right'
-}).catch(async()=>{
- try{
-  const image=await loadImage(PHOTO_SOURCE);
-  buildPanorama(image,false);photoReady=true;setPhotoMode(true);
-  backdropNote.textContent='360° fallback · mirrored single image'
- }catch(e){
-  backdropNote.textContent='360° photo unavailable · original 3D space active';
-  backdropToggle.textContent='↻ 3D SPACE MODE'
- }
-});
+// The old stitched four-view panorama duplicated Earth in every quadrant.
+// Start with a continuous deep-space sky and a SINGLE actual 3D Earth instead.
+buildCleanSpacePanorama();
+photoReady=true;setPhotoMode(true);
+backdropNote.textContent='Single Earth · seamless 360° space · real 3D station';
 // Real depth layer beyond the station windows. The panorama is only the
 // farthest horizon; all of these objects have perspective and parallax as you
 // walk. Their positions are in the same coordinate system as the gallery.
