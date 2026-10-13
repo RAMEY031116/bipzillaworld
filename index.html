@@ -1599,13 +1599,21 @@ function render(now){
  if(active&&!modal&&!renderer.xr.isPresenting){
   const forward=Number(!!(keys.KeyW||keys.ArrowUp))-Number(!!(keys.KeyS||keys.ArrowDown));
   const strafe=Number(!!(keys.KeyD||keys.ArrowRight))-Number(!!(keys.KeyA||keys.ArrowLeft));
-  const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*strafe)*dt*6.2;
-  const dz=(-Math.cos(yaw)*forward-Math.sin(yaw)*strafe)*dt*6.2;
-  const sx=(Math.cos(yaw)*strafe)*dt*6.2;
-  const sz=(-Math.sin(yaw)*strafe)*dt*6.2;
-  const nx=camera.position.x+dx+sx,nz=camera.position.z+dz+sz;
+  // One normalized movement vector: diagonal walking is not faster,
+  // and strafe is not accidentally applied twice.
+  const length=Math.hypot(forward,strafe)||1;
+  const step=dt*6.2/length;
+  const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*strafe)*step;
+  const dz=(-Math.cos(yaw)*forward-Math.sin(yaw)*strafe)*step;
+  const nx=camera.position.x+dx,nz=camera.position.z+dz;
   if(walkable(nx,nz)){camera.position.x=nx;camera.position.z=nz}
-  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch
+  else{
+   // Sliding along a wall feels natural and prevents sticky corners.
+   if(walkable(nx,camera.position.z))camera.position.x=nx;
+   if(walkable(camera.position.x,nz))camera.position.z=nz
+  }
+  camera.rotation.order='YXZ';camera.rotation.y=yaw;
+  camera.rotation.x=Math.max(-1.2,Math.min(1.2,pitch))
  }
  if(photoEnabled&&panoramaMesh)panoramaMesh.position.copy(camera.position);
  renderer.render(scene,camera)
