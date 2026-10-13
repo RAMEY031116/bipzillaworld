@@ -1,12 +1,12 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BIPZILLAWORLD — Hidden Himalayan Museum</title>
-<style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#a6c5d7;color:#32261e;font-family:system-ui}canvas{display:block;touch-action:none}button{font:inherit;cursor:pointer}#hud{position:fixed;inset:0;pointer-events:none}header{display:flex;justify-content:space-between;align-items:start;padding:16px 22px;background:linear-gradient(#fff1d9f0,transparent)}.brand{font-size:27px;font-weight:900;letter-spacing:-1.5px}.brand b{color:#b64430}.small{font-size:10px;font-weight:800;letter-spacing:.16em;color:#9f4d36}.location{background:#fff7e9ef;border-left:4px solid #b84332;padding:10px 15px}.location strong{display:block;margin-top:5px}#bottom{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:end;gap:15px}.guide{padding:12px 16px;background:#fff6e7e8;font-size:11px;line-height:1.85}.tabs{display:flex;gap:5px;pointer-events:auto}.tabs button,#reset{border:1px solid #ab937f;background:#fff7e9ec;padding:12px;font-size:11px;font-weight:800}.tabs button.active{background:#ab4531;color:white}#reset{position:absolute;top:102px;right:15px;pointer-events:auto}#toast{position:absolute;top:23%;left:50%;transform:translateX(-50%);background:#fff4deec;padding:12px 18px;opacity:0;transition:opacity .25s}.cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:23px;color:#fff8ec;text-shadow:0 1px 7px #40201d}
-#intro{position:fixed;inset:0;z-index:10;display:grid;place-items:center;text-align:center;padding:25px;background:radial-gradient(circle at 70% 22%,#f9c98c,transparent 43%),radial-gradient(circle at 15% 85%,#aac5a9,transparent 43%),#f1d7b7}#intro h1{font-size:clamp(65px,11vw,145px);font-weight:900;letter-spacing:-.09em;line-height:.84;margin:23px 0}#intro h1 b{color:#b4422e}#intro p{max-width:560px;margin:0 auto 25px;line-height:1.8}#enter{background:#ad442f;color:white;border:0;padding:16px 35px;font-weight:800;letter-spacing:.14em}
-#modal{position:fixed;inset:0;background:#1b1816ed;z-index:12;display:none;align-items:center;justify-content:center;padding:20px}.panel{display:grid;grid-template-columns:1.1fr .9fr;background:#faf0e2;width:min(1000px,100%);max-height:92vh;overflow:auto}.photo{display:grid;place-items:center;background:#d1c3b5;min-height:350px;padding:22px}.photo img{max-height:76vh;max-width:100%;object-fit:contain}.info{padding:36px;display:flex;flex-direction:column;justify-content:center}.info h2{font-size:38px;letter-spacing:-.04em;margin:15px 0}.info p{color:#66574b;font-size:13px;line-height:1.8}.info button{align-self:start;border:0;color:white;background:#ae432f;padding:12px 19px;margin-top:23px}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BIPZILLAWORLD — Orbital Art Museum</title>
+<style>*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#030713;color:#eaf3ff;font-family:system-ui}canvas{display:block;touch-action:none}button{font:inherit;cursor:pointer}#hud{position:fixed;inset:0;pointer-events:none}header{display:flex;justify-content:space-between;align-items:start;padding:16px 22px;background:linear-gradient(#081325e8,transparent)}.brand{font-size:27px;font-weight:900;letter-spacing:-1.5px}.brand b{color:#73d8fa}.small{font-size:10px;font-weight:800;letter-spacing:.16em;color:#74ccef}.location{background:#10223ae8;border-left:4px solid #71d8ff;padding:10px 15px}.location strong{display:block;margin-top:5px}#bottom{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:end;gap:15px}.guide{padding:12px 16px;background:#0e2239e8;font-size:11px;line-height:1.85}.tabs{display:flex;gap:5px;pointer-events:auto}.tabs button,#reset{border:1px solid #4c829d;background:#142b44ec;padding:12px;font-size:11px;font-weight:800}.tabs button.active{background:#17658a;color:white}#reset{position:absolute;top:102px;right:15px;pointer-events:auto}#toast{position:absolute;top:23%;left:50%;transform:translateX(-50%);background:#102e49ee;padding:12px 18px;opacity:0;transition:opacity .25s}.cross{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:23px;color:#fff8ec;text-shadow:0 1px 7px #40201d}
+#intro{position:fixed;inset:0;z-index:10;display:grid;place-items:center;text-align:center;padding:25px;background:radial-gradient(circle at 70% 22%,#16476c,transparent 43%),radial-gradient(circle at 15% 85%,#25215e,transparent 43%),#050a1b}#intro h1{font-size:clamp(65px,11vw,145px);font-weight:900;letter-spacing:-.09em;line-height:.84;margin:23px 0}#intro h1 b{color:#76dbff}#intro p{max-width:560px;margin:0 auto 25px;line-height:1.8}#enter{background:#176b9b;color:white;border:0;padding:16px 35px;font-weight:800;letter-spacing:.14em}
+#modal{position:fixed;inset:0;background:#1b1816ed;z-index:12;display:none;align-items:center;justify-content:center;padding:20px}.panel{display:grid;grid-template-columns:1.1fr .9fr;background:#faf0e2;width:min(1000px,100%);max-height:92vh;overflow:auto}.photo{display:grid;place-items:center;background:#d1c3b5;min-height:350px;padding:22px}.photo img{max-height:76vh;max-width:100%;object-fit:contain}.info{padding:36px;display:flex;flex-direction:column;justify-content:center}.info h2{font-size:38px;letter-spacing:-.04em;margin:15px 0}.info p{color:#66574b;font-size:13px;line-height:1.8}.info button{align-self:start;border:0;color:white;background:#176b9b;padding:12px 19px;margin-top:23px}
 #fallback{display:none;position:fixed;inset:0;z-index:20;overflow:auto;background:#fbf0e3;padding:28px}#fallback .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}#fallback img{width:100%;aspect-ratio:3/4;object-fit:cover}
-@media(max-width:700px){header{padding:10px}.brand{font-size:20px}.small{font-size:8px}.location{padding:7px}.location strong{font-size:11px}.guide{display:none}#reset{top:85px;right:10px}.tabs button{font-size:9px;padding:9px 7px}#intro h1{font-size:67px}.panel{display:block}.photo{min-height:200px}.photo img{max-height:48vh}.info{padding:22px}}#credits{position:absolute;bottom:84px;right:15px;font-size:10px;color:#493d35;background:#fff6e3ce;padding:5px 9px;pointer-events:auto}#credits a{color:#683d2f} @media(max-width:700px){#credits{display:none}}
+@media(max-width:700px){header{padding:10px}.brand{font-size:20px}.small{font-size:8px}.location{padding:7px}.location strong{font-size:11px}.guide{display:none}#reset{top:85px;right:10px}.tabs button{font-size:9px;padding:9px 7px}#intro h1{font-size:67px}.panel{display:block}.photo{min-height:200px}.photo img{max-height:48vh}.info{padding:22px}}#credits{position:absolute;bottom:84px;right:15px;font-size:10px;color:#c8def1;background:#11283ed9;padding:5px 9px;pointer-events:auto}#credits a{color:#683d2f} @media(max-width:700px){#credits{display:none}}
 </style></head><body>
-<div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">THE HIDDEN HIMALAYAN MUSEUM</div></div><div class="location"><div class="small" id="area">KATHMANDU VALLEY</div><strong id="spot">Temple Square</strong></div></header><button id="reset">↺ RESTART</button><div class="cross">+</div><div id="toast"></div><div id="credits">Himalayan panorama: <a href="https://commons.wikimedia.org/wiki/File:Annapurna_Massif-IMG_5221-Pano.jpg" target="_blank" rel="noopener noreferrer">Bijay Chaurasia / Wikimedia Commons · CC BY-SA 4.0</a> · <a href="https://zenodo.org/records/10293668" target="_blank" rel="noopener noreferrer">Patan shrine scan: NepalVR360 / Semantic Creation, CC BY</a> · Materials: <a href="https://polyhaven.com" target="_blank" rel="noopener noreferrer">Poly Haven (CC0)</a></div><div id="bottom"><div class="guide"><strong>EXPLORE THE HIDDEN HIMALAYAN MUSEUM</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Discover the stupa, lake & hillside</div><div class="tabs"><button class="active" data-zone="0">TEMPLE SQUARE</button><button data-zone="1">STUPA HILL</button><button data-zone="2">POKHARA</button></div></div></div>
-<div id="intro"><div><div class="small" style="font-size:12px">HIDDEN COURTYARDS · MOUNTAINS · ART</div><h1>BIPZILLA<br><b>WORLD.</b></h1><p>Enter a hidden Himalayan art sanctuary inspired by Nepalese architecture. Pass beneath a carved gateway into a temple courtyard, explore sheltered art galleries and discover mountain views beyond.</p><button id="enter">ENTER THE WORLD →</button><p style="font-size:11px;margin-top:20px">An artistic interpretation of Nepalese architecture · Best on desktop</p></div></div>
+<div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">AN ART MUSEUM BEYOND EARTH</div></div><div class="location"><div class="small" id="area">BIPZILLA STATION</div><strong id="spot">Orbital Arrival</strong></div></header><button id="reset">↺ RESTART</button><div class="cross">+</div><div id="toast"></div><div id="credits">Original procedural orbital environment · Artwork by BIPZILLAWORLD</div><div id="bottom"><div class="guide"><strong>EXPLORE THE ORBITAL MUSEUM</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Explore the observatories and planetary overlook</div><div class="tabs"><button class="active" data-zone="0">ORBITAL HUB</button><button data-zone="1">NEBULA GALLERY</button><button data-zone="2">PLANET OVERLOOK</button></div></div></div>
+<div id="intro"><div><div class="small" style="font-size:12px">STARS · PLANETS · ART · EXPLORATION</div><h1>BIPZILLA<br><b>WORLD.</b></h1><p>Step aboard an extraordinary art museum orbiting a distant world. Wander luminous observation halls, discover artworks across the station and look out over the planets.</p><button id="enter">ENTER THE WORLD →</button><p style="font-size:11px;margin-top:20px">An original interactive space-art experience · Best on desktop</p></div></div>
 <div id="modal"><div class="panel"><div class="photo" id="photo"></div><div class="info"><div class="small">ARTWORK FROM BIPZILLAWORLD</div><h2 id="title"></h2><p id="description"></p><button id="close">← RETURN TO WORLD</button></div></div></div><div id="fallback"><h1>BIPZILLAWORLD</h1><p>The 3D engine couldn't load. Browse the artwork collection:</p><div class="grid" id="fallbackgrid"></div></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
 <script type="module">
@@ -429,29 +429,118 @@ function sculptedCourtyard(){
  rise(-1);rise(1);
 }
 
-// A small curated world; no procedurally duplicated rooms or dozens of lights.
-plane(0,-75,410,390,M.grass,-.18);
-plane(0,-12,107,125,M.stone,.035);
-plane(0,-12,104,121,courtyardPavers,.04);
-// Receive soft contact shadows without adding any extra lighting passes.
-for(const child of scene.children)if(child.isMesh&&child.geometry?.type==='PlaneGeometry'&&child.rotation.x< -1.5)child.receiveShadow=true;
-// A single instanced draw call instead of individual paving detail meshes.
-const paving=new T.InstancedMesh(UNIT,M.stone,26),pavMat=new T.Matrix4();
-for(let i=0;i<26;i++){pavMat.compose(new T.Vector3(-52+i*4.15,.07,46),new T.Quaternion(),new T.Vector3(3.9,.08,.11));paving.setMatrixAt(i,pavMat)}
-paving.instanceMatrix.needsUpdate=true;scene.add(paving);
-pagoda(0,-27,1.16,3,'main-pagoda');carvedTemplePanels();pagoda(-39,-73,.73,2,'west-pagoda');pagoda(40,-77,.78,2,'east-pagoda');
-townhouse(-58,-19,.08,0xcda584);townhouse(58,-20,-.08,0xe1c2a1);
-townhouse(-58,-105,.14,0xc4a17e);townhouse(58,-106,-.12,0xd6b28c);
-stupa(92,-114);
-const lake=new T.Mesh(new T.PlaneGeometry(125,125),M.water);lake.rotation.x=-Math.PI/2;lake.position.set(-145,-.1,-100);scene.add(lake);
-for(let n=0;n<3;n++)mountainRange(-260-n*37,n*1.82,19+n*23,22+n*20,[0x657e75,0x8fa4a4,0xbacace][n]);
-for(let i=0;i<22;i++){const x=-170+(i%8)*47,z=-155+Math.floor(i/8)*67;if(Math.abs(x)<77&&z>-116)continue;tree(x,z,6+(i%3)*1.7)}
-buildVegetation();courtyardDetails();
-arrivalGateway();terraceLandscape();
-museumCloisters();craftedTempleDetails();sculptedCourtyard();
-const points=[[25,17,Math.PI],[-25,17,Math.PI],[29,-3,-Math.PI/2],[-29,-3,Math.PI/2],[-25,-99,0],[25,-99,0],[-49,-47,Math.PI/2],[49,-47,-Math.PI/2],[75,-123,-Math.PI/2],[100,-90,Math.PI],[0,-111,0],[-75,-42,Math.PI/2]];
-points.forEach((p,i)=>galleryBoard(...p,i));
-
+// BIPZILLAWORLD ORBITAL — an original walkable space-art observatory.
+// The old Nepal environment is deliberately NOT instantiated in space mode.
+scene.background=new T.Color(0x030713);scene.fog=new T.FogExp2(0x060b1b,.00165);
+renderer.toneMappingExposure=1.05;
+hemi.color.set(0x9cb7ff);hemi.groundColor.set(0x151b3a);hemi.intensity=1.1;
+sun.color.set(0xc6dbff);sun.intensity=2.2;sun.position.set(-90,115,-70);
+const metal=new T.MeshStandardMaterial({color:0x26394d,metalness:.77,roughness:.35});
+const panel=new T.MeshStandardMaterial({color:0x142338,metalness:.62,roughness:.4});
+const edge=new T.MeshStandardMaterial({color:0x80c8ef,metalness:.48,roughness:.32,emissive:0x1c6087,emissiveIntensity:.45});
+const gold=new T.MeshStandardMaterial({color:0xd5a970,metalness:.74,roughness:.31});
+const glass=new T.MeshPhysicalMaterial({color:0x68a9d5,metalness:.15,roughness:.16,transparent:true,opacity:.27,side:T.DoubleSide,depthWrite:false});
+const glow=new T.MeshBasicMaterial({color:0x74dfff});
+const floor=new T.MeshStandardMaterial({color:0x101d31,metalness:.55,roughness:.59});
+function cylinder(g,x,y,z,r,h,m,segments=32){const o=new T.Mesh(new T.CylinderGeometry(r,r,h,segments),m);o.position.set(x,y,z);g.add(o);return o}
+function torus(g,x,y,z,r,t,m,rotationX=Math.PI/2){const o=new T.Mesh(new T.TorusGeometry(r,t,10,80),m);o.rotation.x=rotationX;o.position.set(x,y,z);g.add(o);return o}
+function litLine(g,x,y,z,w,d){box(g,x,y,z,w,.055,d,glow)}
+function platform(g,x,z,w,d){box(g,x,-.54,z,w,1.05,d,metal);box(g,x,-.015,z,w,.09,d,floor);for(const a of [-1,1])litLine(g,x+a*(w/2-.24),.055,z,.11,d-.7);for(const a of [-1,1])litLine(g,x,.055,z+a*(d/2-.24),w-.7,.11)}
+// The central museum, three walkable observation wings and a connecting spine.
+const station=new T.Group();scene.add(station);
+platform(station,0,-22,64,72);
+platform(station,0,38,16,51);
+platform(station,0,-85,16,58);
+platform(station,-60,-35,57,16);
+platform(station,60,-35,57,16);
+platform(station,-74,-35,38,40);
+platform(station,74,-35,38,40);
+platform(station,0,-121,48,30);
+// A monumental portal with depth, ribs and restrained luminous details.
+for(const z of [60,49]){
+  for(const side of [-1,1]){box(station,side*8.0,7.8,z,1.9,15.6,2.3,metal);box(station,side*8.0,6.2,z+1.25,.22,11.5,.18,edge)}
+  box(station,0,15.9,z,19,2.1,2.3,metal);
+  box(station,0,14.5,z+1.25,14,.17,.15,glow);
+}
+for(const z of [41,29,17,5,-7,-19,-31,-43,-55,-67,-79,-91,-103,-115]){
+  for(const side of [-1,1]){
+    const x=side*(z>-65?30:7.5);
+    box(station,x,3.2,z,.6,6.4,.8,metal);
+    box(station,x,6.6,z,1.25,.3,1.5,edge);
+  }
+}
+const dome=new T.Mesh(new T.SphereGeometry(29,56,24,0,Math.PI*2,0,Math.PI/2),glass);
+dome.position.set(0,1,-24);station.add(dome);
+torus(station,0,1,-24,29,.65,metal);
+torus(station,0,1.25,-24,27.9,.10,edge);
+// Exterior mechanical support rings and structural arcs.
+for(let i=0;i<10;i++){
+ const a=i*Math.PI/5,x=Math.cos(a)*29,z=-24+Math.sin(a)*29;
+ const p=new T.Vector3(x,0,z);
+ const rib=new T.Mesh(new T.TorusGeometry(29,.16,8,60,Math.PI/2),i%2?metal:edge);
+ rib.rotation.y=a;rib.position.set(0,1,-24);station.add(rib);
+ cylinder(station,p.x,1.5,p.z,.36,3.0,metal,10);
+}
+for(const side of [-1,1]){
+ const x=side*74;
+ for(let i=0;i<6;i++){
+  const z=-51+i*6.5;
+  box(station,x,3.5,z,30,7,.65,metal);
+  box(station,x,3.6,z+(side===1?.36:-.36),26,5,.11,glass);
+  litLine(station,x,7.1,z,29,.12);
+ }
+ // Long observation windows and structural framing.
+ box(station,x,8.2,-35,38,1.2,42,metal);
+ torus(station,x,9.6,-35,13,.36,edge,0);
+}
+// Central holographic celestial sculpture.
+const core=new T.Group();core.position.set(0,9,-22);scene.add(core);
+const inner=new T.Mesh(new T.IcosahedronGeometry(4.1,3),new T.MeshStandardMaterial({color:0x6ad3f2,metalness:.25,roughness:.18,emissive:0x12659b,emissiveIntensity:1.3}));core.add(inner);
+for(const r of [6.6,8.5,10.3]){
+ const ring=torus(core,0,0,0,r,.17,r===8.5?gold:edge,0);ring.rotation.y=r*.31;ring.rotation.z=r*.17;
+}
+const lamp=new T.PointLight(0x59cfff,45,55,2);lamp.position.set(0,11,-22);scene.add(lamp);
+// Deep space star field, deterministic and single draw call.
+let seed=14719;const rand=()=>((seed=(1664525*seed+1013904223)>>>0)/4294967296);
+const starPos=[];for(let i=0;i<2600;i++){
+ const u=rand()*Math.PI*2,v=Math.acos(2*rand()-1),r=300+rand()*230;
+ starPos.push(Math.sin(v)*Math.cos(u)*r,Math.cos(v)*r,Math.sin(v)*Math.sin(u)*r)
+}
+const starsGeo=new T.BufferGeometry();starsGeo.setAttribute('position',new T.Float32BufferAttribute(starPos,3));
+const stars=new T.Points(starsGeo,new T.PointsMaterial({color:0xe5efff,size:1.65,sizeAttenuation:false,transparent:true,opacity:.91,depthWrite:false}));scene.add(stars);
+// A large blue planetary horizon, visibly spherical with subtle clouds.
+const planet=new T.Group();planet.position.set(100,-42,-275);scene.add(planet);
+const world=new T.Mesh(new T.SphereGeometry(94,64,40),new T.MeshStandardMaterial({color:0x255d91,roughness:.91,metalness:0,emissive:0x061b38,emissiveIntensity:.28}));planet.add(world);
+const cloudMat=new T.MeshStandardMaterial({color:0xb8dcf1,transparent:true,opacity:.17,roughness:1,depthWrite:false});
+for(let i=0;i<13;i++){const band=new T.Mesh(new T.TorusGeometry(95+rand()*.9,1.8+rand()*3,7,110),cloudMat);band.rotation.set(rand()*2,rand()*3,rand()*2);planet.add(band)}
+const atmosphere=new T.Mesh(new T.SphereGeometry(98,56,32),new T.MeshBasicMaterial({color:0x4f9ddc,transparent:true,opacity:.095,side:T.BackSide,depthWrite:false}));planet.add(atmosphere);
+// A warm ringed moon beyond the side wing.
+const moon=new T.Group();moon.position.set(-155,65,-280);scene.add(moon);
+moon.add(new T.Mesh(new T.SphereGeometry(42,48,32),new T.MeshStandardMaterial({color:0xc9a68c,roughness:.9,emissive:0x2c1a1d,emissiveIntensity:.22})));
+const mr=torus(moon,0,0,0,62,7,new T.MeshStandardMaterial({color:0xb3a8b2,transparent:true,opacity:.6,side:T.DoubleSide,roughness:1}),Math.PI*.31);mr.rotation.y=.2;
+// Exterior antenna arrays.
+for(const side of [-1,1])for(let i=0;i<3;i++){
+ const x=side*(94+i*8),z=-35+(i-1)*15;
+ cylinder(station,x,5,z,.7,10,metal,10);
+ torus(station,x,10,z,3.6,.24,edge,0);
+}
+const artPositions=[
+ [-23,-7,Math.PI/2],[-23,-22,Math.PI/2],[-23,-37,Math.PI/2],
+ [23,-7,-Math.PI/2],[23,-22,-Math.PI/2],[23,-37,-Math.PI/2],
+ [-73,-23,Math.PI],[-73,-47,0],[73,-23,Math.PI],[73,-47,0],
+ [-11,-123,0],[11,-123,0]
+];
+artPositions.forEach((p,i)=>galleryBoard(...p,i));
+const spaceArt=new T.Group();scene.add(spaceArt);
+for(const p of artPositions){
+ const [x,z,a]=p;
+ const frame=new T.Group();frame.position.set(x,0,z);frame.rotation.y=a;spaceArt.add(frame);
+ box(frame,0,2.4,-.34,4.8,5.0,.24,metal);
+ box(frame,0,2.4,-.22,4.35,4.55,.12,edge);
+ box(frame,0,5.0,-.34,5.0,.12,.22,glow);
+}
+// Keep old imported Nepal assets and photographic panorama disabled in orbital mode.
+const ORBITAL_MODE=true;
 // Asset-based rendering: a real GLB replaces each procedural fallback only AFTER loading.
 // Model paths are configured in scene-assets.json and resolved by Streamlit.
 async function loadExternalSceneAssets(){
@@ -511,15 +600,15 @@ async function loadExternalSceneAssets(){
     },undefined,error=>console.warn('Optional Himalayan panorama unavailable',error));
   }
 }
-loadExternalSceneAssets();
+if(!ORBITAL_MODE)loadExternalSceneAssets();
 
 const ray=new T.Raycaster();const keys={};let active=false,modal=false,dragging=false,yaw=0,pitch=0,downX=0,downY=0,last=performance.now(),zone=0;
-const spawns=[{x:0,z:70,y:2.1,title:'Arrival Gate',area:'KATHMANDU VALLEY',yaw:0},{x:76,z:-95,y:2.1,title:'Stupa View',area:'HIMALAYAN HILLS',yaw:-.2},{x:-105,z:-54,y:2.1,title:'Lakeside Trail',area:'POKHARA INSPIRED',yaw:.55}];
+const spawns=[{x:0,z:65,y:2.1,title:'Orbital Arrival',area:'BIPZILLA STATION',yaw:0},{x:-74,z:-35,y:2.1,title:'Nebula Gallery',area:'WEST OBSERVATORY',yaw:-1.1},{x:0,z:-119,y:2.1,title:'Planetary Overlook',area:'DEEP SPACE',yaw:0}];
 function notice(s){let t=$('toast');t.textContent=s;t.style.opacity=1;clearTimeout(notice.timer);notice.timer=setTimeout(()=>t.style.opacity=0,2300)}
 function teleport(i){zone=i;const p=spawns[i];camera.position.set(p.x,p.y,p.z);yaw=p.yaw;pitch=0;$('spot').textContent=p.title;$('area').textContent=p.area;document.querySelectorAll('[data-zone]').forEach((b,j)=>b.classList.toggle('active',i===j));notice(p.title)}
 function inspect(){ray.setFromCamera(new T.Vector2(0,0),camera);const hits=ray.intersectObjects(pickables);if(!hits.length||hits[0].distance>10)return;const a=hits[0].object.userData.art;$('title').textContent=a.title||'Artwork';$('description').textContent=a.description||'From the BIPZILLAWORLD art collection';$('photo').innerHTML='';const im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Artwork';$('photo').append(im);$('modal').style.display='flex';modal=true}
 function dismiss(){modal=false;$('modal').style.display='none'}
-$('enter').onclick=()=>{active=true;$('intro').style.display='none';notice('WELCOME TO THE HIDDEN HIMALAYAN MUSEUM')};
+$('enter').onclick=()=>{active=true;$('intro').style.display='none';notice('WELCOME TO BIPZILLA ORBITAL')};
 $('reset').onclick=()=>teleport(0);$('close').onclick=dismiss;$('modal').onclick=e=>{if(e.target.id==='modal')dismiss()};
 document.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>teleport(Number(b.dataset.zone)));
 renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;downX=e.clientX;downY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
