@@ -500,14 +500,66 @@ for(const r of [6.6,8.5,10.3]){
  const ring=torus(core,0,0,0,r,.17,r===8.5?gold:edge,0);ring.rotation.y=r*.31;ring.rotation.z=r*.17;
 }
 const lamp=new T.PointLight(0x59cfff,45,55,2);lamp.position.set(0,11,-22);scene.add(lamp);
-// Deep space star field, deterministic and single draw call.
+// Deterministic stellar field with real point-sprite discs and subtle scintillation.
+// Individual star sizes, temperatures and phases vary: no flat square point sprites.
 let seed=14719;const rand=()=>((seed=(1664525*seed+1013904223)>>>0)/4294967296);
-const starPos=[];for(let i=0;i<2600;i++){
- const u=rand()*Math.PI*2,v=Math.acos(2*rand()-1),r=300+rand()*230;
- starPos.push(Math.sin(v)*Math.cos(u)*r,Math.cos(v)*r,Math.sin(v)*Math.sin(u)*r)
+const starPos=[],starSize=[],starTint=[],starPhase=[];
+const cold=new T.Color(0xaec9ff),warm=new T.Color(0xffdbad),white=new T.Color(0xffffff);
+for(let i=0;i<5100;i++){
+ const u=rand()*Math.PI*2,v=Math.acos(2*rand()-1),r=310+rand()*240;
+ starPos.push(Math.sin(v)*Math.cos(u)*r,Math.cos(v)*r,Math.sin(v)*Math.sin(u)*r);
+ starSize.push(rand()<.025?3.2+rand()*2.8:.7+rand()*1.65);
+ const c=white.clone().lerp(rand()<.55?cold:warm,rand()*.7);
+ starTint.push(c.r,c.g,c.b);starPhase.push(rand()*6.283)
 }
-const starsGeo=new T.BufferGeometry();starsGeo.setAttribute('position',new T.Float32BufferAttribute(starPos,3));
-const stars=new T.Points(starsGeo,new T.PointsMaterial({color:0xe5efff,size:1.65,sizeAttenuation:false,transparent:true,opacity:.91,depthWrite:false}));scene.add(stars);
+const starsGeo=new T.BufferGeometry();
+starsGeo.setAttribute('position',new T.Float32BufferAttribute(starPos,3));
+starsGeo.setAttribute('aSize',new T.Float32BufferAttribute(starSize,1));
+starsGeo.setAttribute('aTint',new T.Float32BufferAttribute(starTint,3));
+starsGeo.setAttribute('aPhase',new T.Float32BufferAttribute(starPhase,1));
+const starUniforms={uTime:{value:0},uPixelRatio:{value:renderer.getPixelRatio()}};
+const stars=new T.Points(starsGeo,new T.ShaderMaterial({
+ uniforms:starUniforms,transparent:true,depthWrite:false,blending:T.AdditiveBlending,
+ vertexShader:`
+ attribute float aSize;attribute vec3 aTint;attribute float aPhase;
+ varying vec3 vTint;varying float vPhase;
+ uniform float uPixelRatio;
+ void main(){
+   vTint=aTint;vPhase=aPhase;
+   vec4 mv=modelViewMatrix*vec4(position,1.);
+   gl_Position=projectionMatrix*mv;
+   gl_PointSize=min(10.,aSize*uPixelRatio);
+ }`,
+ fragmentShader:`
+ uniform float uTime;varying vec3 vTint;varying float vPhase;
+ void main(){
+   float r=length(gl_PointCoord-.5)*2.;
+   float core=exp(-r*r*17.);
+   float halo=exp(-r*r*4.)*.22;
+   float flicker=.86+.14*sin(uTime*.8+vPhase);
+   float alpha=(core+halo)*flicker;
+   if(alpha<.008)discard;
+   gl_FragColor=vec4(vTint*1.6,alpha);
+ }`
+}));scene.add(stars);
+// Cloudlike nebulae are distant translucent volume impressions, not opaque billboards.
+function nebulaSprite(cx,cy,cz,size,colors){
+ const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;
+ const ctx=canvas.getContext('2d');
+ for(let i=0;i<48;i++){
+   const x=256+(rand()-.5)*270,y=256+(rand()-.5)*200;
+   const r=35+rand()*115;
+   const gradient=ctx.createRadialGradient(x,y,0,x,y,r);
+   const col=colors[i%colors.length];
+   gradient.addColorStop(0,col);gradient.addColorStop(.45,col.replace(/[\d.]+\)$/,'0.055)'));gradient.addColorStop(1,'rgba(0,0,0,0)');
+   ctx.fillStyle=gradient;ctx.fillRect(x-r,y-r,2*r,2*r)
+ }
+ const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
+ const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,color:0xffffff,transparent:true,depthWrite:false,blending:T.AdditiveBlending,opacity:.7}));
+ sprite.position.set(cx,cy,cz);sprite.scale.set(size,size,1);scene.add(sprite);return sprite
+}
+nebulaSprite(-190,100,-390,280,['rgba(40,104,201,0.13)','rgba(115,55,176,0.12)','rgba(19,180,190,0.11)']);
+nebulaSprite(190,-40,-440,310,['rgba(34,100,168,0.11)','rgba(102,44,169,0.10)','rgba(39,153,189,0.12)']);
 // A large blue planetary horizon, visibly spherical with subtle clouds.
 const planet=new T.Group();planet.position.set(100,-42,-275);scene.add(planet);
 const world=new T.Mesh(new T.SphereGeometry(94,64,40),new T.MeshStandardMaterial({color:0x255d91,roughness:.91,metalness:0,emissive:0x061b38,emissiveIntensity:.28}));planet.add(world);
