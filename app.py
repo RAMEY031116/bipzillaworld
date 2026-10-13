@@ -11,11 +11,11 @@ import streamlit.components.v1 as components
 
 ROOT = Path(__file__).resolve().parent
 REPO = "RAMEY031116/bipzillaworld"
-st.set_page_config(page_title="BIPZILLAWORLD · Open Art Universe", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="BIPZILLAWORLD · Orbital Art Museum", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""<style>
 header[data-testid="stHeader"],footer,#MainMenu,[data-testid="stToolbar"]{display:none!important}
 .block-container{padding:0!important;max-width:100%!important}
-[data-testid="stAppViewContainer"]{background:#f7eee4}
+[data-testid="stAppViewContainer"]{background:#030713}
 iframe{display:block;border:0}
 </style>""", unsafe_allow_html=True)
 
