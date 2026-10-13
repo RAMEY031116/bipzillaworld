@@ -237,11 +237,11 @@ function galleryBoard(x,z,angle){
  const art=new T.Mesh(new T.PlaneGeometry(4.04,4.48),
   exhibitionMaterial.canvas.clone());
  art.position.set(0,2.85,.43);g.add(art);pickables.push(art);
- const frame={g,art,labelCanvas,labelTexture,request:0,loadedTexture:null,index:-1};
+ const frame={g,art,labelCanvas,labelTexture,request:0,loadedTexture:null,index:-1,imageQueued:false};
  galleryFrames.push(frame);return frame
 }
 function updateFrame(frame,index){
- frame.request++;
+ frame.request++;frame.imageQueued=false;
  if(frame.loadedTexture){frame.loadedTexture.dispose();frame.loadedTexture=null}
  frame.art.material.map=null;frame.art.material.needsUpdate=true;
  frame.art.scale.set(1,1,1);
@@ -257,8 +257,11 @@ function updateFrame(frame,index){
  ctx.font='18px system-ui,sans-serif';ctx.fillStyle='#96cfe2';
  ctx.fillText('BIPZILLAWORLD  ·  '+String(index+1).padStart(3,'0'),256,95);
  frame.labelTexture.needsUpdate=true;
- const request=frame.request;
- const load=(url,isFallback)=>{
+ frame.loadImage=()=>{
+  if(frame.imageQueued||!frame.g.visible)return;
+  frame.imageQueued=true;
+  const request=frame.request;
+  const load=(url,isFallback)=>{
   if(!url)return;
   galleryTextureLoader.load(url,tx=>{
    if(frame.request!==request){tx.dispose();return}
@@ -270,20 +273,22 @@ function updateFrame(frame,index){
   },undefined,()=>{if(frame.request===request&&!isFallback)load(a.fallback_image,true)})
  };
  // Load only visible frames; never decode every image in a 500-piece archive.
- load(a.image,false)
+  load(a.image,false)
+ };
 }
 function showExhibitionPage(page){
- const pages=Math.max(1,Math.ceil(ART.length/galleryFrames.length));
+ const capacity=isMobileDevice?30:galleryFrames.length;
+ const pages=Math.max(1,Math.ceil(ART.length/capacity));
  exhibitionPage=(page%pages+pages)%pages;
- const start=exhibitionPage*galleryFrames.length;
- galleryFrames.forEach((frame,i)=>updateFrame(frame,start+i));
+ const start=exhibitionPage*capacity;
+ galleryFrames.forEach((frame,i)=>updateFrame(frame,i<capacity?start+i:ART.length));
  const text='EXHIBITION '+(exhibitionPage+1)+' / '+pages+'  ·  '+ART.length+' ARTWORKS';
  $('exhibition-status').textContent=text;
  $('exhibition-prev').disabled=pages===1;
  $('exhibition-next').disabled=pages===1;
  $('exhibition-prev').title='Previous group of artwork';
  $('exhibition-next').title='Next group of artwork';
- notice('Now showing artworks '+(start+1)+'–'+Math.min(start+galleryFrames.length,ART.length));
+ notice('Now showing artworks '+(start+1)+'–'+Math.min(start+capacity,ART.length));
 }
 function pagoda(x,z,scale=1,levels=3,slot=''){const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);if(slot)sceneFallback(slot,g);const base=17;
  for(let i=0;i<4;i++)box(g,0,.18+i*.30,0,base+3.4-i*.75,.36,base+3.4-i*.75,M.stone);
@@ -1913,6 +1918,14 @@ renderer.xr.enabled=false;
 function render(now){
  const dt=Math.max(0,Math.min((now-last)/1000,.06));last=now;
  const elapsed=now*.001;
+ // Load artwork textures only when a visitor approaches their gallery bay.
+ // Hundreds of future uploads never decode into GPU memory all at once.
+ if(!render.lastGalleryCheck||now-render.lastGalleryCheck>650){
+  render.lastGalleryCheck=now;
+  for(const frame of galleryFrames){
+   if(frame.g.visible&&!frame.imageQueued&&frame.g.position.distanceToSquared(camera.position)<2704)frame.loadImage?.()
+  }
+ }
  if(focusTransition){const f=focusTransition,t=Math.min(1,(now-f.start)/f.duration),e=t*t*(3-2*t);camera.position.lerpVectors(f.from,f.to,e);yaw=f.yawStart+f.yawDelta*e;pitch=f.pitchStart+(f.pitchEnd-f.pitchStart)*e;camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;if(t>=1){focusTransition=null;showArtwork(f.index)}}
  // The distant photographic shell follows the visitor's location, but not
  // their rotation. This makes turning 360° reveal new directions.
