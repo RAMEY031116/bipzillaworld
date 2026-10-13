@@ -2,6 +2,13 @@
 
 **Status:** Preparation underway. The 3D scene currently uses procedural placeholders for the arrival gate, pagodas and cliff. None should be represented as a finished realistic asset.
 
+## October 2026 active integration update
+
+A **real low-poly photogrammetry Patan chaitya** (Semantic Creation / NepalVR360, via [Zenodo record 10293668](https://zenodo.org/records/10293668), CC BY) is now configured as an **optional external 3D asset** at the arrival-courtyard edge. The viewer normalizes its size to ~3.8 world metres. If Zenodo blocks CORS or changes its download path, loading will fail gracefully and the rest of the world remains usable. Confirm licensing and attribution against the original record before production promotion.
+
+This does **not** replace the detailed pagoda, houses, natural vegetation or terrain GLBs still needed for final visual quality. A browser screenshot and measured FPS remain outstanding.
+
+
 ## Existing project integration
 - `scene-assets.json`: Phase 1 model slots (`arrival-gate`, `terrain-cliff`, `main-pagoda`, `museum-pavilion`) and positions.
 - `index.html`: named fallback meshes for arrival gate, hero pagoda and sculpted terrain; higher-quality GLBs automatically replace the matching fallback when successfully loaded.
