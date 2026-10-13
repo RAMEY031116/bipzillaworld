@@ -7,18 +7,30 @@
 <div id="hud"><header><div><div class="brand">bipzilla<b>world.</b></div><div class="small">A NEPAL-INSPIRED INTERACTIVE ART WORLD</div></div><div class="location"><div class="small" id="area">KATHMANDU VALLEY</div><strong id="spot">Temple Square</strong></div></header><button id="reset">↺ RESTART</button><div class="cross">+</div><div id="toast"></div><div id="bottom"><div class="guide"><strong>EXPLORE THE TEMPLE SQUARE</strong><br>WASD / arrows — walk · Mouse drag — look around · Scroll — zoom<br>Click framed art to view · Discover the stupa, lake & hillside</div><div class="tabs"><button class="active" data-zone="0">TEMPLE SQUARE</button><button data-zone="1">STUPA HILL</button><button data-zone="2">POKHARA</button></div></div></div>
 <div id="intro"><div><div class="small" style="font-size:12px">TEMPLES · COURTYARDS · MOUNTAINS · ART</div><h1>BIPZILLA<br><b>WORLD.</b></h1><p>Walk through a Kathmandu-inspired square with multi-tiered pagoda temples, carved-looking timber details and brick courtyards. Explore a stupa, the Himalayas and a lakeside art trail.</p><button id="enter">ENTER THE WORLD →</button><p style="font-size:11px;margin-top:20px">An artistic interpretation of Nepalese architecture · Best on desktop</p></div></div>
 <div id="modal"><div class="panel"><div class="photo" id="photo"></div><div class="info"><div class="small">ARTWORK FROM BIPZILLAWORLD</div><h2 id="title"></h2><p id="description"></p><button id="close">← RETURN TO WORLD</button></div></div></div><div id="fallback"><h1>BIPZILLAWORLD</h1><p>The 3D engine couldn't load. Browse the artwork collection:</p><div class="grid" id="fallbackgrid"></div></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
 <script type="module">
 
 const ART=__ART_DATA__;
+const SCENE_ASSETS=__SCENE_CONFIG__;
 const $=id=>document.getElementById(id);
 function showFallback(message){$('intro').style.display='none';$('fallback').style.display='block';$('fallback').querySelector('p').textContent=message||'3D unavailable — browse the artwork collection.';for(const a of ART){let el=document.createElement('div'),im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Art';el.append(im,document.createTextNode(a.title||'Untitled'));$('fallbackgrid').append(el)}}
-let T;try{T=await import('https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js')}catch(err){console.error(err);showFallback('The 3D library could not load. Here is your art gallery.');throw err}
+let T;try{T=await import('three')}catch(err){console.error(err);showFallback('The 3D library could not load. Here is your art gallery.');throw err}
 let renderer;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch(err){showFallback('This browser cannot display WebGL. Your artwork is still available.');throw err}
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;document.body.prepend(renderer.domElement);
+const visualQuality=SCENE_ASSETS.quality||{};
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, visualQuality.maxPixelRatio||1.25));
+renderer.shadowMap.enabled=visualQuality.shadows!==false;
+renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.27;document.body.prepend(renderer.domElement);
 const scene=new T.Scene();scene.background=new T.Color(0xb5cddd);scene.fog=new T.Fog(0xb5cddd,170,510);
 const camera=new T.PerspectiveCamera(69,innerWidth/innerHeight,.08,650);
 const hemi=new T.HemisphereLight(0xfff0d9,0x74776c,2.15);scene.add(hemi);
-const sun=new T.DirectionalLight(0xffe2b8,2.05);sun.position.set(-65,105,50);scene.add(sun);
+const sun=new T.DirectionalLight(0xffe2b8,2.05);sun.position.set(-65,105,50);
+sun.castShadow=renderer.shadowMap.enabled;
+sun.shadow.mapSize.set(visualQuality.shadowMapSize||1024,visualQuality.shadowMapSize||1024);
+sun.shadow.camera.left=-125;sun.shadow.camera.right=125;
+sun.shadow.camera.top=125;sun.shadow.camera.bottom=-125;
+sun.shadow.camera.near=1;sun.shadow.camera.far=320;
+sun.shadow.bias=-.00035;sun.shadow.normalBias=.025;
+scene.add(sun);
 const textures={};
 function texture(kind){
  if(textures[kind])return textures[kind];
@@ -34,6 +46,8 @@ function texture(kind){
 function mat(hex,rough=.88,tex){return new T.MeshStandardMaterial({color:hex,roughness:rough,map:tex?texture(tex):null,side:T.FrontSide})}
 const M={brick:mat(0xffffff,.9,'brick'),stone:mat(0xffffff,.96,'stone'),wood:mat(0xffffff,.9,'wood'),roof:mat(0xffffff,.95,'roof'),dark:mat(0x261e1a),gold:mat(0xc59b52,.64),plaster:mat(0xdfc4a3),white:mat(0xf2ebe0),green:mat(0x738864),grass:mat(0x9da78a,.98,'earth'),water:new T.MeshStandardMaterial({color:0x5d9caa,roughness:.31,metalness:.05}),shade:mat(0x4e3429),red:mat(0x963a31)};
 const UNIT=new T.BoxGeometry(1,1,1),pickables=[],colliders=[],landmarks=[];
+const fallbackModels=new Map();
+function sceneFallback(id,group){group.name='fallback-'+id;fallbackModels.set(id,group)}
 function box(g,x,y,z,w,h,d,m){let o=new T.Mesh(UNIT,m);o.position.set(x,y,z);o.scale.set(w,h,d);g.add(o);return o}
 function pole(g,x,y,z,r,h,m,s=10){let o=new T.Mesh(new T.CylinderGeometry(r,r,h,s),m);o.position.set(x,y,z);g.add(o);return o}
 function cone(g,x,y,z,r,h,m,n=8){let o=new T.Mesh(new T.ConeGeometry(r,h,n),m);o.position.set(x,y,z);g.add(o);return o}
@@ -85,7 +99,7 @@ function galleryBoard(x,z,angle,i){if(!ART.length)return;const a=ART[i%ART.lengt
  const art=new T.Mesh(new T.PlaneGeometry(3.36,3.55),new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide}));art.position.set(0,2.45,.39);art.userData={art:a};g.add(art);pickables.push(art);
  if(a.image){const tx=new T.TextureLoader().load(a.image);tx.colorSpace=T.SRGBColorSpace;art.material.map=tx;art.material.needsUpdate=true}
 }
-function pagoda(x,z,scale=1,levels=3){const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);const base=17;
+function pagoda(x,z,scale=1,levels=3,slot=''){const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);if(slot)sceneFallback(slot,g);const base=17;
  for(let i=0;i<4;i++)box(g,0,.18+i*.30,0,base+3.4-i*.75,.36,base+3.4-i*.75,M.stone);
  steps(g,7,2.5,.05);
  box(g,0,3.6,0,12,5.1,12,M.brick);
@@ -118,7 +132,7 @@ function carvedTemplePanels(){
  }
  mesh.instanceMatrix.needsUpdate=true;g.add(mesh)
 }
-function stupa(x,z){const g=new T.Group();g.position.set(x,0,z);scene.add(g);
+function stupa(x,z){const g=new T.Group();g.position.set(x,0,z);scene.add(g);sceneFallback('stupa',g);
  for(let i=0;i<4;i++)box(g,0,.25+i*.42,0,20-i*1.0,.48,20-i*1.0,M.stone);
  for(let i=0;i<3;i++)pole(g,0,1.94+i*.6,0,8-i*.7,1.1,M.white,30);
  const dome=new T.Mesh(new T.SphereGeometry(6.3,28,16,0,Math.PI*2,0,Math.PI/2),M.white);dome.position.y=3.3;g.add(dome);
@@ -130,6 +144,7 @@ function stupa(x,z){const g=new T.Group();g.position.set(x,0,z);scene.add(g);
  // Low-cost colourful prayer flags as separate cloth planes on a line
  const flagCols=[0x266cac,0xf0e5c5,0xbe3d37,0x79a17e,0xd3a735];
  for(let a=0;a<6;a++){const phi=(a/6)*Math.PI*2;for(let k=0;k<12;k++){let r=5+k*1.65,xx=x+Math.cos(phi)*r,zz=z+Math.sin(phi)*r;let flag=new T.Mesh(new T.PlaneGeometry(.84,.53),new T.MeshBasicMaterial({color:flagCols[k%5],side:T.DoubleSide}));flag.position.set(xx,14.2-k*.53,zz);flag.rotation.y=phi;scene.add(flag)}}}
+const scenicMountains=[];
 function mountainRange(z,offset,base,peak,color){
  // Real triangulated ridged terrain rather than a single billboard ribbon.
  // 56 horizontal sections x 8 depth sections, coloured by altitude and slope.
@@ -151,18 +166,20 @@ function mountainRange(z,offset,base,peak,color){
  geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));
  geo.setAttribute('color',new T.Float32BufferAttribute(shades,3));
  geo.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();
- scene.add(new T.Mesh(geo,new T.MeshLambertMaterial({vertexColors:true,side:T.DoubleSide})))
+ const ridge=new T.Mesh(geo,new T.MeshLambertMaterial({vertexColors:true,side:T.DoubleSide}));scene.add(ridge);scenicMountains.push(ridge)
 }
 function tree(x,z,h=7){const g=new T.Group();g.position.set(x,0,z);scene.add(g);pole(g,0,h*.35,0,.35,h*.7,M.wood,7);for(let k=0;k<3;k++)cone(g,0,h*.5+k*h*.17,0,2.5-k*.37,h*.6,M.green,9)}
 // A small curated world; no procedurally duplicated rooms or dozens of lights.
 plane(0,-75,410,390,M.grass,-.18);
 plane(0,-12,107,125,M.stone,.035);
 plane(0,-12,104,121,M.brick,.04);
+// Receive soft contact shadows without adding any extra lighting passes.
+for(const child of scene.children)if(child.isMesh&&child.geometry?.type==='PlaneGeometry'&&child.rotation.x< -1.5)child.receiveShadow=true;
 // A single instanced draw call instead of individual paving detail meshes.
 const paving=new T.InstancedMesh(UNIT,M.stone,26),pavMat=new T.Matrix4();
 for(let i=0;i<26;i++){pavMat.compose(new T.Vector3(-52+i*4.15,.07,46),new T.Quaternion(),new T.Vector3(3.9,.08,.11));paving.setMatrixAt(i,pavMat)}
 paving.instanceMatrix.needsUpdate=true;scene.add(paving);
-pagoda(0,-27,1.16,3);carvedTemplePanels();pagoda(-39,-73,.73,2);pagoda(40,-77,.78,2);
+pagoda(0,-27,1.16,3,'main-pagoda');carvedTemplePanels();pagoda(-39,-73,.73,2,'west-pagoda');pagoda(40,-77,.78,2,'east-pagoda');
 townhouse(-58,-19,.08,0xcda584);townhouse(58,-20,-.08,0xe1c2a1);
 townhouse(-58,-105,.14,0xc4a17e);townhouse(58,-106,-.12,0xd6b28c);
 stupa(92,-114);
@@ -171,6 +188,55 @@ for(let n=0;n<3;n++)mountainRange(-260-n*37,n*1.82,19+n*23,22+n*20,[0x657e75,0x8
 for(let i=0;i<22;i++){const x=-170+(i%8)*47,z=-155+Math.floor(i/8)*67;if(Math.abs(x)<77&&z>-116)continue;tree(x,z,6+(i%3)*1.7)}
 const points=[[25,17,Math.PI],[-25,17,Math.PI],[29,-3,-Math.PI/2],[-29,-3,Math.PI/2],[-25,-99,0],[25,-99,0],[-49,-47,Math.PI/2],[49,-47,-Math.PI/2],[75,-123,-Math.PI/2],[100,-90,Math.PI],[0,-111,0],[-75,-42,Math.PI/2]];
 points.forEach((p,i)=>galleryBoard(...p,i));
+
+// Asset-based rendering: a real GLB replaces each procedural fallback only AFTER loading.
+// Model paths are configured in scene-assets.json and resolved by Streamlit.
+async function loadExternalSceneAssets(){
+  const models=(SCENE_ASSETS.models||[]).filter(a=>a.url);
+  if(models.length){
+    try{
+      const {GLTFLoader}=await import('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/loaders/GLTFLoader.js');
+      const loader=new GLTFLoader();
+      await Promise.all(models.map(async entry=>{
+        try{
+          const gltf=await loader.loadAsync(entry.url);
+          const object=gltf.scene;
+          object.position.fromArray(entry.position||[0,0,0]);
+          object.rotation.y=entry.rotationY||0;
+          if(Array.isArray(entry.scale))object.scale.fromArray(entry.scale);
+          else object.scale.setScalar(entry.scale||1);
+          object.traverse(node=>{
+            if(node.isMesh){
+              node.castShadow=entry.castShadow!==false;
+              node.receiveShadow=true;
+              if(node.material&&'envMapIntensity' in node.material)node.material.envMapIntensity=.7;
+            }
+          });
+          scene.add(object);
+          const procedural=fallbackModels.get(entry.replaces);
+          if(procedural)procedural.visible=false;
+          notice('Loaded '+(entry.id||'new 3D model'));
+        }catch(error){console.warn('Optional model could not load:',entry.file,error)}
+      }));
+    }catch(error){console.warn('GLTFLoader unavailable; procedural architecture retained.',error)}
+  }
+  const bg=SCENE_ASSETS.panorama||{};
+  if(bg.url){
+    new T.TextureLoader().load(bg.url,tex=>{
+      tex.colorSpace=T.SRGBColorSpace;
+      const width=bg.width||500,height=bg.height||180,d=bg.distance||245;
+      const scenic=new T.Mesh(new T.PlaneGeometry(width,height),
+        new T.MeshBasicMaterial({map:tex,side:T.DoubleSide,transparent:true,depthWrite:false}));
+      scenic.position.set(0,(bg.verticalOffset||16)+height*.30,-d);
+      scenic.renderOrder=-1;
+      scene.add(scenic);
+      // Hide the procedural distant ridges when photographic scenery is present.
+      for(const node of scenicMountains)node.visible=false;
+    },undefined,error=>console.warn('Optional Himalayan panorama unavailable',error));
+  }
+}
+loadExternalSceneAssets();
+
 const ray=new T.Raycaster();const keys={};let active=false,modal=false,dragging=false,yaw=0,pitch=0,downX=0,downY=0,last=performance.now(),zone=0;
 const spawns=[{x:0,z:64,y:2.1,title:'Temple Square',area:'KATHMANDU VALLEY',yaw:0},{x:76,z:-95,y:2.1,title:'Stupa View',area:'HIMALAYAN HILLS',yaw:-.2},{x:-105,z:-54,y:2.1,title:'Lakeside Trail',area:'POKHARA INSPIRED',yaw:.55}];
 function notice(s){let t=$('toast');t.textContent=s;t.style.opacity=1;clearTimeout(notice.timer);notice.timer=setTimeout(()=>t.style.opacity=0,2300)}
