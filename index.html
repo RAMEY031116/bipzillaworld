@@ -560,15 +560,74 @@ function nebulaSprite(cx,cy,cz,size,colors){
 }
 nebulaSprite(-190,100,-390,280,['rgba(40,104,201,0.13)','rgba(115,55,176,0.12)','rgba(19,180,190,0.11)']);
 nebulaSprite(190,-40,-440,310,['rgba(34,100,168,0.11)','rgba(102,44,169,0.10)','rgba(39,153,189,0.12)']);
+// Real surface detail on spheres: seeded layered noise creates continents,
+// shallow seas, icecaps and cloud bands; proper sphere normals supply 3D lighting.
+function hash2(x,y,seedValue){
+ let n=Math.imul(x,374761393)+Math.imul(y,668265263)+Math.imul(seedValue,1442695041);
+ n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;
+}
+function smoothNoise(x,y,seedValue){
+ const ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy;
+ const sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy);
+ const a=hash2(ix,iy,seedValue),b=hash2(ix+1,iy,seedValue);
+ const c=hash2(ix,iy+1,seedValue),d=hash2(ix+1,iy+1,seedValue);
+ return (a+(b-a)*sx)*(1-sy)+(c+(d-c)*sx)*sy
+}
+function fbm(x,y,seedValue){
+ let sum=0,amp=.53,frequency=1;
+ for(let o=0;o<5;o++){sum+=amp*smoothNoise(x*frequency,y*frequency,seedValue+o*17);frequency*=2;amp*=.49}
+ return sum
+}
+function surfaceTexture(kind,w=768,h=384){
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+ const ctx=canvas.getContext('2d'),pixels=ctx.createImageData(w,h),p=pixels.data;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+   const u=x/w,v=y/h,latitude=Math.abs(v-.5)*2;
+   const large=fbm(u*5.5,v*3.5,kind==='ocean'?71:93);
+   const fine=fbm(u*28,v*14,kind==='ocean'?121:55);
+   const polar=latitude>.77?Math.min(1,(latitude-.77)*4.6):0;
+   let rgb;
+   if(kind==='ocean'){
+     const land=large*.83+fine*.17+Math.sin(u*13+v*7)*.023>.45;
+     if(polar>.3)rgb=[177+fine*55,201+fine*43,218+fine*32];
+     else if(land){
+       const height=large*.6+fine*.4;
+       rgb=height>.56?[116+fine*70,119+fine*57,105+fine*51]:
+         [40+fine*63,95+fine*85,71+fine*53];
+     }else{
+       const shallow=large>.38;
+       rgb=shallow?[12+fine*24,91+fine*60,137+fine*67]:[7+fine*18,37+fine*35,90+fine*49]
+     }
+   }else if(kind==='clouds'){
+     const belt=.25*Math.sin(v*53+Math.sin(u*28)*.7);
+     const density=fine*.55+large*.45+belt;
+     const alpha=Math.max(0,Math.min(210,(density-.42)*540));
+     rgb=[236,242,249,alpha]
+   }else{
+     const n=large*.65+fine*.35;
+     const crater=Math.sin(u*117+Math.sin(v*53)*3)*Math.cos(v*101+Math.sin(u*31)*3);
+     const c=Math.max(35,Math.min(235,90+n*124+crater*14));
+     rgb=[c*1.06,c*.83,c*.70]
+   }
+   const index=(y*w+x)*4;p[index]=rgb[0];p[index+1]=rgb[1];p[index+2]=rgb[2];p[index+3]=rgb[3]??255
+ }
+ ctx.putImageData(pixels,0,0);
+ const tx=new T.CanvasTexture(canvas);tx.colorSpace=T.SRGBColorSpace;
+ tx.wrapS=T.RepeatWrapping;tx.anisotropy=4;return tx
+}
+const oceanTexture=surfaceTexture('ocean');
+const cloudTexture=surfaceTexture('clouds');
+const moonTexture=surfaceTexture('rock',512,256);
+
 // A large blue planetary horizon, visibly spherical with subtle clouds.
 const planet=new T.Group();planet.position.set(100,-42,-275);scene.add(planet);
-const world=new T.Mesh(new T.SphereGeometry(94,64,40),new T.MeshStandardMaterial({color:0x255d91,roughness:.91,metalness:0,emissive:0x061b38,emissiveIntensity:.28}));planet.add(world);
-const cloudMat=new T.MeshStandardMaterial({color:0xb8dcf1,transparent:true,opacity:.17,roughness:1,depthWrite:false});
-for(let i=0;i<13;i++){const band=new T.Mesh(new T.TorusGeometry(95+rand()*.9,1.8+rand()*3,7,110),cloudMat);band.rotation.set(rand()*2,rand()*3,rand()*2);planet.add(band)}
+const world=new T.Mesh(new T.SphereGeometry(94,96,64),new T.MeshStandardMaterial({map:oceanTexture,roughness:.86,metalness:0,emissive:0x061426,emissiveIntensity:.10}));planet.add(world);
+const cloudShell=new T.Mesh(new T.SphereGeometry(95.3,80,48),new T.MeshStandardMaterial({map:cloudTexture,transparent:true,opacity:.64,roughness:1,depthWrite:false,side:T.FrontSide}));
+planet.add(cloudShell);
 const atmosphere=new T.Mesh(new T.SphereGeometry(98,56,32),new T.MeshBasicMaterial({color:0x4f9ddc,transparent:true,opacity:.095,side:T.BackSide,depthWrite:false}));planet.add(atmosphere);
 // A warm ringed moon beyond the side wing.
 const moon=new T.Group();moon.position.set(-155,65,-280);scene.add(moon);
-moon.add(new T.Mesh(new T.SphereGeometry(42,48,32),new T.MeshStandardMaterial({color:0xc9a68c,roughness:.9,emissive:0x2c1a1d,emissiveIntensity:.22})));
+const moonSurface=new T.Mesh(new T.SphereGeometry(42,64,48),new T.MeshStandardMaterial({map:moonTexture,roughness:.95,emissive:0x1b1112,emissiveIntensity:.12}));moon.add(moonSurface);
 const mr=torus(moon,0,0,0,62,7,new T.MeshStandardMaterial({color:0xb3a8b2,transparent:true,opacity:.6,side:T.DoubleSide,roughness:1}),Math.PI*.31);mr.rotation.y=.2;
 // Exterior antenna arrays.
 for(const side of [-1,1])for(let i=0;i<3;i++){
