@@ -1222,12 +1222,89 @@ loadImage(PANORAMA_SOURCE).then(image=>{
   backdropToggle.textContent='↻ 3D SPACE MODE'
  }
 });
+// Real depth layer beyond the station windows. The panorama is only the
+// farthest horizon; all of these objects have perspective and parallax as you
+// walk. Their positions are in the same coordinate system as the gallery.
+const orbitalExterior=new T.Group();scene.add(orbitalExterior);
+const hullMaterial=new T.MeshStandardMaterial({color:0x657d8f,metalness:.82,roughness:.33});
+const darkHull=new T.MeshStandardMaterial({color:0x192b3d,metalness:.8,roughness:.39});
+const outerGold=new T.MeshStandardMaterial({color:0xbda079,metalness:.85,roughness:.26});
+const outerGlow=new T.MeshBasicMaterial({color:0x8ac8e8});
+function orbitRing(x,y,z,r,thickness,material,rx=0,ry=0){
+ const m=new T.Mesh(new T.TorusGeometry(r,thickness,7,72),material);
+ m.position.set(x,y,z);m.rotation.set(rx,ry,0);orbitalExterior.add(m);return m
+}
+// Radial exterior docking structure, visible as the camera turns toward
+// side windows. Multiple concentric metal hoops create perspective cues.
+for(const side of [-1,1]){
+ const sx=side*107;
+ for(let i=0;i<3;i++){
+  orbitRing(sx,8,-25-i*16,17-i*1.8,.42,hullMaterial,0,Math.PI*.14*side);
+  orbitRing(sx,8,-25-i*16,15.9-i*1.8,.07,outerGlow,0,Math.PI*.14*side)
+ }
+ for(let j=0;j<8;j++){
+  const a=j*Math.PI/4;
+  const rail=new T.Mesh(new T.CylinderGeometry(.16,.16,34,7),darkHull);
+  rail.position.set(sx+Math.cos(a)*15.3,8+Math.sin(a)*15.3,-43);
+  rail.rotation.x=Math.PI/2;orbitalExterior.add(rail)
+ }
+ // A lit spacecraft dock at a different depth from the panorama.
+ const dock=new T.Group();dock.position.set(sx,1,-56);orbitalExterior.add(dock);
+ const coreDock=new T.Mesh(new T.CylinderGeometry(5.4,5.4,18,14),hullMaterial);
+ coreDock.rotation.x=Math.PI/2;dock.add(coreDock);
+ for(const zz of [-9,9]){
+  const rim=new T.Mesh(new T.TorusGeometry(5.5,.3,8,32),outerGold);
+  rim.position.z=zz;dock.add(rim)
+ }
+ for(const x of [-11,11]){
+  const panel=new T.Mesh(new T.BoxGeometry(9,.2,6),darkHull);
+  panel.position.set(x,0,0);dock.add(panel);
+  for(let k=0;k<4;k++){
+   const stripe=new T.Mesh(new T.BoxGeometry(.065,.24,5.6),outerGlow);
+   stripe.position.set(x-3.5+k*2.2,.14,0);dock.add(stripe)
+  }
+ }
+}
+// An actual exterior satellite orbits the observatory on a slow circular
+// path. Unlike the photograph, it moves relative to the 3D architecture.
+const orbitalSatellite=new T.Group();orbitalExterior.add(orbitalSatellite);
+const satBody=new T.Mesh(new T.BoxGeometry(3,2,5),hullMaterial);
+orbitalSatellite.add(satBody);
+for(const side of [-1,1]){
+ const wing=new T.Mesh(new T.BoxGeometry(9,.1,4),darkHull);
+ wing.position.x=side*6;orbitalSatellite.add(wing);
+ for(let k=0;k<4;k++){
+  const strip=new T.Mesh(new T.BoxGeometry(.06,.13,3.7),outerGlow);
+  strip.position.set(side*(2.8+k*1.8),.08,0);orbitalSatellite.add(strip)
+ }
+}
+const antenna=new T.Mesh(new T.CylinderGeometry(.05,.05,4,6),outerGold);
+antenna.position.y=2.5;orbitalSatellite.add(antenna);
+// Three-dimensional, dimmed star pinpoints remain visible in the panorama
+// mode and shift naturally with the camera, without another image download.
+const depthStarCount=isMobileDevice?130:360;
+const depthPositions=new Float32Array(depthStarCount*3);
+for(let i=0;i<depthStarCount;i++){
+ const a=Math.random()*Math.PI*2,up=Math.random()*1.4-.7;
+ const r=260+Math.random()*85;
+ depthPositions[i*3]=Math.cos(a)*Math.cos(up)*r;
+ depthPositions[i*3+1]=Math.sin(up)*r;
+ depthPositions[i*3+2]=Math.sin(a)*Math.cos(up)*r
+}
+const depthGeo=new T.BufferGeometry();
+depthGeo.setAttribute('position',new T.BufferAttribute(depthPositions,3));
+const depthStars=new T.Points(depthGeo,new T.PointsMaterial({
+ color:0xdceeff,size:1.1,sizeAttenuation:false,transparent:true,opacity:.55,
+ depthWrite:false
+}));orbitalExterior.add(depthStars);
+// Preserve these moving parts during the static geometry batching pass.
+
 // Batch static architecture boxes into instanced draw calls. This changes
 // rendering only; original art planes stay independent for click inspection.
 function batchStaticBoxes(){
  scene.updateMatrixWorld(true);
  const batches=new Map(),remove=[];
- const ignored=new Set([core,probe,debris,planet,moon,distantSun]);
+ const ignored=new Set([core,probe,debris,planet,moon,distantSun,orbitalExterior]);
  function visit(node,insideDynamic=false){
   const dynamic=insideDynamic||ignored.has(node);
   if(!dynamic&&node.isMesh&&node.geometry===UNIT&&!node.userData?.art&&
@@ -1409,6 +1486,8 @@ function render(now){
   if(slowFrames>75&&qualityIndex>0){applyQuality(qualityIndex-1,true);slowFrames=0}
  }
  starUniforms.uTime.value=elapsed;solarUniforms.time.value=elapsed;
+ orbitalSatellite.position.set(Math.sin(elapsed*.045)*116,15+Math.sin(elapsed*.075)*12,-95+Math.cos(elapsed*.045)*36);
+ orbitalSatellite.rotation.y=elapsed*.12;
  world.rotation.y+=dt*.006;cloudShell.rotation.y+=dt*.008;
  moonSurface.rotation.y+=dt*.003;ringSystem.rotation.z+=dt*.0007;
  core.rotation.y+=dt*.13;core.rotation.z=Math.sin(elapsed*.12)*.045;
