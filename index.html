@@ -1629,7 +1629,7 @@ function inspect(clientX,clientY){
   yawStart:yaw,yawDelta:shortest,pitchStart:pitch,pitchEnd:endPitch,index};
  $('art-hint').classList.remove('visible');return true
 }
-function dismiss(){focusTransition=null;modal=false;$('modal').style.display='none'}
+function dismiss(){focusTransition=null;modal=false;$('modal').style.display='none';for(const k of Object.keys(keys))keys[k]=false}
 $('art-prev').onclick=()=>showArtwork(selectedArtworkIndex-1);
 $('art-next').onclick=()=>showArtwork(selectedArtworkIndex+1);
 $('art-close-x').onclick=dismiss;
@@ -1654,9 +1654,11 @@ renderer.domElement.addEventListener('pointermove',e=>{
  $('art-hint').classList.toggle('visible',!!close);
  renderer.domElement.style.cursor=close?'pointer':'grab'
 });
-renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;downX=e.clientX;downY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
-renderer.domElement.addEventListener('pointerup',e=>{if(Math.hypot(e.clientX-downX,e.clientY-downY)<9&&active&&!modal)inspect(e.clientX,e.clientY);dragging=false});
-renderer.domElement.addEventListener('pointermove',e=>{if(!dragging||modal||!active)return;yaw-=e.movementX*.0034;pitch=T.MathUtils.clamp(pitch-e.movementY*.0034,-1.08,1.08)});
+let lastPointerX=0,lastPointerY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{if(focusTransition)return;dragging=true;downX=lastPointerX=e.clientX;downY=lastPointerY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
+renderer.domElement.addEventListener('pointerup',e=>{if(Math.hypot(e.clientX-downX,e.clientY-downY)<12&&active&&!modal&&!focusTransition)inspect(e.clientX,e.clientY);dragging=false});
+renderer.domElement.addEventListener('pointercancel',()=>{dragging=false});
+renderer.domElement.addEventListener('pointermove',e=>{if(!dragging||modal||!active||focusTransition)return;const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;lastPointerX=e.clientX;lastPointerY=e.clientY;yaw-=dx*.0034;pitch=T.MathUtils.clamp(pitch-dy*.0034,-1.08,1.08)});
 // Touchscreen walking controls; the rest of the canvas remains drag-to-look.
 document.querySelectorAll('[data-walk]').forEach(button=>{
  const key=button.dataset.walk;
@@ -1665,7 +1667,7 @@ document.querySelectorAll('[data-walk]').forEach(button=>{
   button.addEventListener(event,e=>{e.preventDefault();keys[key]=false})
  }
 });
-window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyE'&&!modal)inspect();if(e.code==='Escape')dismiss();if(e.code.startsWith('Arrow'))e.preventDefault()});
+window.addEventListener('keydown',e=>{if(modal){if(e.code.startsWith('Arrow'))e.preventDefault();return}keys[e.code]=true;if(e.code==='KeyE')inspect();if(e.code.startsWith('Arrow'))e.preventDefault()});
 window.addEventListener('keyup',e=>keys[e.code]=false);
 renderer.domElement.addEventListener('wheel',e=>{camera.fov=T.MathUtils.clamp(camera.fov+Math.sign(e.deltaY)*3,46,87);camera.updateProjectionMatrix()},{passive:true});
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false)});
@@ -1683,8 +1685,9 @@ function applyQuality(level,automatic=false){
  qualityIndex=Math.max(0,Math.min(2,level));
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,qualityLevels[qualityIndex]));
  renderer.setSize(innerWidth,innerHeight,false);
- debris.visible=qualityIndex>0;
- probe.visible=qualityIndex>0;
+ // Do not re-enable floating asteroid debris in the clean single-Earth view.
+ debris.visible=false;
+ probe.visible=!photoEnabled&&qualityIndex>0;
  $('quality').textContent='⚙ QUALITY: '+qualityNames[qualityIndex];
  $('quality-note').textContent=automatic?'Performance adjusted automatically':'Display detail: '+qualityNames[qualityIndex];
 }
