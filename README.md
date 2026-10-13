@@ -1,5 +1,19 @@
 # BIPZILLAWORLD 🎨
 
+## Scenic realism update — real Himalayan photography and temple details
+
+This pass makes a meaningful visual improvement without turning BIPZILLAWORLD into a large open-world game:
+
+- The default distant backdrop is a **real Annapurna panoramic photograph**, loaded over HTTPS from Wikimedia Commons. The source may fail on restricted networks; in that case, the previous generated mountain scenery remains as fallback.
+- The former conical trees are replaced by instanced trunks, angled branches, and irregular shaded foliage clumps. This reduces repeated draw calls while producing more organic silhouettes.
+- Two stone guardian sculptures and bronze temple ornaments now sit near the main courtyard.
+- Soft directional sunlight and roof shadows remain enabled, and the private Streamlit artist upload dashboard is unchanged.
+
+**Photograph credit:** [Bijay Chaurasia, *Annapurna Massif panorama*, Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Annapurna_Massif-IMG_5221-Pano.jpg), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Used as scenic backdrop without altering the source file. The visible in-world footer repeats this credit.
+
+**Scope:** A good photograph as a distant backdrop is not a substitute for a photogrammetry-quality temple, statue or tree model. The foreground remains an optimized procedural interpretation until actual high-quality `.glb` assets are supplied. Performance and visual fidelity should be verified on the deployed site.
+
+
 ## Asset-ready semi-realistic Nepal scene (October 2026)
 
 The WebGL scene now supports replacing the procedural temple models with actual **glTF binary (`.glb`) 3D assets**. It includes optional soft directional sun shadows and photographic Himalayan backdrop support.
