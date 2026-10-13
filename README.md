@@ -1,5 +1,8 @@
 # BIPZILLAWORLD 🎨
 
+> **Creative direction and build specification:** [Hidden Himalayan Museum production blueprint](HIDDEN_HIMALAYAN_MUSEUM_BLUEPRINT.md) — the six-zone layout, required real 3D assets, lighting, atmosphere, performance targets, and acceptance criteria. The blueprint does not mean all models have been implemented yet.
+
+
 ## Kathmandu environment enhancement — October 2026
 
 This version focuses on a small, scenic simulation rather than an enormous open world.
