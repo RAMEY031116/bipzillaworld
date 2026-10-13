@@ -40,6 +40,23 @@ def museum():
                 w["image"] = "data:" + mime + ";base64," + base64.b64encode(target.read_bytes()).decode("ascii")
         works.append(w)
     html = (ROOT / "index.html").read_text(encoding="utf-8")
+    config = json.loads((ROOT / "scene-assets.json").read_text(encoding="utf-8"))
+    # Streamlit's embedded iframe cannot serve repo-relative files directly.
+    # Convert configured public assets into raw GitHub URLs for GLTFLoader.
+    raw_base = "https://raw.githubusercontent.com/" + REPO + "/main/"
+    for entry in config.get("models", []):
+        path = Path(str(entry.get("file", "")))
+        entry["url"] = (raw_base + path.as_posix()) if (
+            path.parts and not path.is_absolute() and ".." not in path.parts
+            and path.suffix.lower() == ".glb"
+        ) else ""
+    panorama = config.get("panorama", {})
+    p = Path(str(panorama.get("file", "")))
+    panorama["url"] = (raw_base + p.as_posix()) if (
+        p.parts and not p.is_absolute() and ".." not in p.parts
+        and p.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp")
+    ) else ""
+    html = html.replace("__SCENE_CONFIG__", json.dumps(config).replace("</", "<\\/"))
     return html.replace("__ART_DATA__", json.dumps(works).replace("</", "<\\/"))
 
 def gh_request(method, path, token, **kwargs):
