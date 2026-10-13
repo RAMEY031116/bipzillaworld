@@ -440,9 +440,9 @@ function sculptedCourtyard(){
 // BIPZILLAWORLD ORBITAL — an original walkable space-art observatory.
 // The old Nepal environment is deliberately NOT instantiated in space mode.
 scene.background=new T.Color(0x030713);scene.fog=new T.FogExp2(0x060b1b,.00165);
-renderer.toneMappingExposure=1.05;
+renderer.toneMappingExposure=1.1;
 hemi.color.set(0x9cb7ff);hemi.groundColor.set(0x151b3a);hemi.intensity=1.1;
-sun.color.set(0xc6dbff);sun.intensity=2.2;sun.position.set(-90,115,-70);
+sun.color.set(0xc6dbff);sun.intensity=2.2;sun.position.set(-118,86,-335);
 const metal=new T.MeshStandardMaterial({color:0x26394d,metalness:.77,roughness:.35});
 const panel=new T.MeshStandardMaterial({color:0x142338,metalness:.62,roughness:.4});
 const edge=new T.MeshStandardMaterial({color:0x80c8ef,metalness:.48,roughness:.32,emissive:0x1c6087,emissiveIntensity:.45});
@@ -628,10 +628,64 @@ const cloudTexture=surfaceTexture('clouds');
 const moonTexture=surfaceTexture('rock',512,256);
 
 // A large blue planetary horizon, visibly spherical with subtle clouds.
-const planet=new T.Group();planet.position.set(100,-42,-275);scene.add(planet);
+const planet=new T.Group();planet.position.set(62,-33,-194);planet.rotation.z=.08;scene.add(planet);
 const world=new T.Mesh(new T.SphereGeometry(94,96,64),new T.MeshStandardMaterial({map:oceanTexture,roughness:.86,metalness:0,emissive:0x061426,emissiveIntensity:.10}));planet.add(world);
 const cloudShell=new T.Mesh(new T.SphereGeometry(95.3,80,48),new T.MeshStandardMaterial({map:cloudTexture,transparent:true,opacity:.64,roughness:1,depthWrite:false,side:T.FrontSide}));
 planet.add(cloudShell);
+// NASA's real satellite-composite Blue Marble is preferred over procedural land.
+// Three.js's bundled Earth texture is the backup if NASA's image host blocks CORS.
+// The procedural surface is retained if both image downloads fail.
+const satelliteTextures=new T.TextureLoader();
+function loadSurfaceWithFallback(urls,onLoaded){
+ const tryNext=(index)=>{
+  if(index>=urls.length){console.warn('Earth photo textures unavailable; using procedural surface');return}
+  satelliteTextures.load(urls[index],texture=>{
+   texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=4;onLoaded(texture)
+  },undefined,()=>tryNext(index+1))
+ };
+ tryNext(0)
+}
+loadSurfaceWithFallback([
+ 'https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.png',
+ 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_atmos_2048.jpg'
+],texture=>{
+ world.material.map=texture;world.material.color.set(0xffffff);
+ world.material.needsUpdate=true;
+ console.info('Photographic Earth surface loaded')
+});
+satelliteTextures.load(
+ 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_clouds_1024.png',
+ texture=>{
+  texture.colorSpace=T.SRGBColorSpace;
+  cloudShell.material.map=texture;
+  cloudShell.material.opacity=.88;
+  cloudShell.material.needsUpdate=true
+ },undefined,()=>console.info('Using procedural clouds')
+);
+// Correctly layered thin shell for night-side city lights: source texture
+// contributes only where sunlight does not directly illuminate the surface.
+const nightLightsMaterial=new T.ShaderMaterial({
+ uniforms:{lightsMap:{value:null},lightDir:{value:new T.Vector3(-.5,.5,.7).normalize()}},
+ vertexShader:`
+ varying vec2 vUv;varying vec3 vNormal;
+ void main(){vUv=uv;vNormal=normalize(mat3(modelMatrix)*normal);
+ gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+ fragmentShader:`
+ uniform sampler2D lightsMap;uniform vec3 lightDir;
+ varying vec2 vUv;varying vec3 vNormal;
+ void main(){vec3 c=texture2D(lightsMap,vUv).rgb;
+ float night=smoothstep(.10,-.30,dot(normalize(vNormal),lightDir));
+ gl_FragColor=vec4(c*1.25,night*max(c.r,max(c.g,c.b))*.8);}`,
+ transparent:true,depthWrite:false,blending:T.AdditiveBlending
+});
+const nightLights=new T.Mesh(new T.SphereGeometry(94.15,80,48),nightLightsMaterial);
+nightLights.visible=false;planet.add(nightLights);
+satelliteTextures.load(
+ 'https://cdn.jsdelivr.net/npm/three@0.165.0/examples/textures/planets/earth_lights_2048.png',
+ texture=>{texture.colorSpace=T.SRGBColorSpace;
+ nightLightsMaterial.uniforms.lightsMap.value=texture;nightLights.visible=true
+ },undefined,()=>console.info('City lights unavailable')
+);
 // Fresnel limb glow: the planet's atmosphere brightens around its silhouette.
 const atmosphere=new T.Mesh(new T.SphereGeometry(98,64,48),new T.ShaderMaterial({
  uniforms:{glowColor:{value:new T.Color(0x67b6ff)}},
@@ -699,15 +753,15 @@ for(const side of [-1,1]){
 cylinder(probe,0,4,0,.16,8,gold,8);
 const dish=new T.Mesh(new T.SphereGeometry(2.1,20,12,0,Math.PI*2,0,Math.PI/2),gold);dish.position.y=8.2;probe.add(dish);
 // A bright distant sun with a soft corona, not an opaque white disc.
-const distantSun=new T.Group();distantSun.position.set(-240,175,-440);scene.add(distantSun);
-distantSun.add(new T.Mesh(new T.SphereGeometry(12,32,24),new T.MeshBasicMaterial({color:0xffe8bc})));
+const distantSun=new T.Group();distantSun.position.set(-118,86,-335);scene.add(distantSun);
+distantSun.add(new T.Mesh(new T.SphereGeometry(18,48,32),new T.MeshBasicMaterial({color:0xffedc9})));
 const flareCanvas=document.createElement('canvas');flareCanvas.width=256;flareCanvas.height=256;
 const fc=flareCanvas.getContext('2d'),flare=fc.createRadialGradient(128,128,2,128,128,128);
 flare.addColorStop(0,'rgba(255,246,217,1)');flare.addColorStop(.16,'rgba(255,221,162,.8)');
 flare.addColorStop(.38,'rgba(255,174,106,.24)');flare.addColorStop(1,'rgba(255,120,60,0)');
 fc.fillStyle=flare;fc.fillRect(0,0,256,256);
 const sunHalo=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(flareCanvas),transparent:true,blending:T.AdditiveBlending,depthWrite:false}));
-sunHalo.scale.set(95,95,1);distantSun.add(sunHalo);
+sunHalo.scale.set(165,165,1);distantSun.add(sunHalo);
 
 // Exterior antenna arrays.
 for(const side of [-1,1])for(let i=0;i<3;i++){
