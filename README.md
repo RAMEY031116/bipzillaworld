@@ -2,6 +2,14 @@
 
 **Active experience (October 2026): a walkable 3D space-art station.** The former Nepal/Himalayan museum is **archived creative history**, not the current scene.
 
+### Cinematic image + live 3D hybrid (October 2026)
+
+The user requested that the website resemble the generated cinematic space-station reference rather than a simple mobile-game-like dome. **A new hybrid mode is implemented in `index.html` and `app.py`:** the panoramic cinematic image is used as a lightweight, fixed distant backdrop while the museum architecture, 19 artwork frames, Nepal flags, floor and walk controls remain real Three.js objects. A small look-based parallax offset gives the image a subtle response when the camera rotates. This is deliberately a **2D image background + genuine 3D foreground**, not a fully navigable 3D model of everything in the photograph.
+
+**One asset upload is still required to activate it:** extract `BIPZILLAWORLD_cinematic_backdrop_upload.zip` from the chat and add `assets/orbital-cinematic.webp` to this GitHub repository. Streamlit's `app.py` then automatically embeds the photo into its sandboxed iframe, while standalone `index.html` loads the same relative path. On successful load the photo mode turns on automatically and hides the simple procedural Earth, Sun, stars and asteroids, avoiding a doubled planet view and reducing GPU work. The **✦ PHOTO SCENERY** button switches between image-backed and procedural 3D views. Until the image file is added, the original 3D backdrop remains and the button explains that the photo is missing.
+
+The supplied photo is an AI-generated cinematic concept reference, **not a NASA photograph or a true 360-degree skybox**. It will not have correct 3D parallax when walking. A truly photorealistic fully navigable station would require dedicated textured 3D assets, HDR environment lighting and visual/performance testing.
+
 ### Earth-window composition + Nepal in space — October 2026
 
 The default visitor spawn is now **inside the main observation hall**, looking directly through the panoramic window toward a **larger, repositioned Earth**. The large dome is now almost invisible glass rather than the earlier opaque blue layer, and the scene retains the sculpted curved window arches, marble and bronze interiors. A central viewing telescope and lounge seating help the hall feel inhabited.
