@@ -786,7 +786,7 @@ async function loadExternalSceneAssets(){
 if(!ORBITAL_MODE)loadExternalSceneAssets();
 
 const ray=new T.Raycaster();const keys={};let active=false,modal=false,dragging=false,yaw=0,pitch=0,downX=0,downY=0,last=performance.now(),zone=0;
-const spawns=[{x:0,z:65,y:2.1,title:'Orbital Arrival',area:'BIPZILLA STATION',yaw:0},{x:-74,z:-35,y:2.1,title:'Nebula Gallery',area:'WEST OBSERVATORY',yaw:-1.1},{x:0,z:-119,y:2.1,title:'Planetary Overlook',area:'DEEP SPACE',yaw:0}];
+const spawns=[{x:0,z:59,y:2.1,title:'Orbital Arrival',area:'BIPZILLA STATION',yaw:0},{x:-74,z:-35,y:2.1,title:'Nebula Gallery',area:'WEST OBSERVATORY',yaw:-1.1},{x:0,z:-119,y:2.1,title:'Planetary Overlook',area:'DEEP SPACE',yaw:0}];
 function notice(s){let t=$('toast');t.textContent=s;t.style.opacity=1;clearTimeout(notice.timer);notice.timer=setTimeout(()=>t.style.opacity=0,2300)}
 function teleport(i){zone=i;const p=spawns[i];camera.position.set(p.x,p.y,p.z);yaw=p.yaw;pitch=0;$('spot').textContent=p.title;$('area').textContent=p.area;document.querySelectorAll('[data-zone]').forEach((b,j)=>b.classList.toggle('active',i===j));notice(p.title)}
 function inspect(){ray.setFromCamera(new T.Vector2(0,0),camera);const hits=ray.intersectObjects(pickables);if(!hits.length||hits[0].distance>10)return;const a=hits[0].object.userData.art;$('title').textContent=a.title||'Artwork';$('description').textContent=a.description||'From the BIPZILLAWORLD art collection';$('photo').innerHTML='';const im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Artwork';$('photo').append(im);$('modal').style.display='flex';modal=true}
@@ -803,7 +803,7 @@ renderer.domElement.addEventListener('wheel',e=>{camera.fov=T.MathUtils.clamp(ca
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 function walkable(x,z){
  // Prevent visitors walking off the station into empty space.
- const areas=[[0,-22,31,35],[0,38,7.6,25],[0,-85,7.6,29],
+ const areas=[[0,-22,31,35],[0,38,7.6,25.5],[0,-85,7.6,29],
  [-60,-35,28,7.5],[60,-35,28,7.5],[-74,-35,18,19],
  [74,-35,18,19],[0,-121,23,14]];
  return areas.some(([cx,cz,hw,hd])=>Math.abs(x-cx)<hw&&Math.abs(z-cz)<hd)
