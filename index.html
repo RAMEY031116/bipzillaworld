@@ -11,8 +11,16 @@
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}</script>
 <script type="module">
 
-const ART=__ART_DATA__;
-const SCENE_ASSETS=__SCENE_CONFIG__;
+// Streamlit injects these manifests. Standalone HTTPS hosting (e.g. GitHub
+// Pages) reads them directly, enabling WebXR without Streamlit's iframe.
+const ART=await (async()=>{try{return __ART_DATA__}catch(e){
+ const response=await fetch('./artworks.json');if(!response.ok)throw Error('Artwork manifest missing');
+ return response.json()
+}})();
+const SCENE_ASSETS=await (async()=>{try{return __SCENE_CONFIG__}catch(e){
+ const response=await fetch('./scene-assets.json');if(!response.ok)return {};
+ return response.json()
+}})();
 const $=id=>document.getElementById(id);
 function showFallback(message){$('intro').style.display='none';$('fallback').style.display='block';$('fallback').querySelector('p').textContent=message||'3D unavailable — browse the artwork collection.';for(const a of ART){let el=document.createElement('div'),im=document.createElement('img');im.src=a.image||'';im.alt=a.title||'Art';el.append(im,document.createTextNode(a.title||'Untitled'));$('fallbackgrid').append(el)}}
 let T;try{T=await import('three')}catch(err){console.error(err);showFallback('The 3D library could not load. Here is your art gallery.');throw err}
