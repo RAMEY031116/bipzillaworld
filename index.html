@@ -150,10 +150,11 @@ function galleryBoard(x,z,angle,i){
   if(!url)return;
   new T.TextureLoader().load(url,tx=>{
    tx.colorSpace=T.SRGBColorSpace;tx.anisotropy=4;
-   // Contain the original composition: never stretch a portrait into a square.
+   // Fit the image on the physical canvas without cropping or distortion.
    const aspect=(tx.image?.width||1)/(tx.image?.height||1),frameAspect=4.04/4.48;
-   if(aspect>frameAspect){tx.repeat.set(1,frameAspect/aspect);tx.offset.set(0,(1-tx.repeat.y)/2)}
-   else{tx.repeat.set(aspect/frameAspect,1);tx.offset.set((1-tx.repeat.x)/2,0)}
+   art.scale.set(1,1,1);
+   if(aspect>frameAspect)art.scale.y=frameAspect/aspect;
+   else art.scale.x=aspect/frameAspect;
    art.material.map=tx;art.material.needsUpdate=true
   },undefined,()=>{if(!fallback)loadArt(a.fallback_image,true)})
  };
@@ -468,6 +469,16 @@ function sculptedCourtyard(){
 // The old Nepal environment is deliberately NOT instantiated in space mode.
 scene.background=new T.Color(0x030713);scene.fog=new T.FogExp2(0x060b1b,.00165);
 renderer.toneMappingExposure=1.1;
+// Physically based environment reflections: the bronze trim, marble and glass
+// should read as materials rather than flat coloured geometry.
+try{
+ const {RoomEnvironment}=await import('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/environments/RoomEnvironment.js');
+ const pmrem=new T.PMREMGenerator(renderer);
+ const environment=new RoomEnvironment(renderer);
+ scene.environment=pmrem.fromScene(environment,.035).texture;
+ environment.dispose();pmrem.dispose()
+}catch(error){console.warn('Optional material reflections unavailable',error)}
+
 hemi.color.set(0x9cb7ff);hemi.groundColor.set(0x151b3a);hemi.intensity=1.1;
 sun.color.set(0xc6dbff);sun.intensity=2.2;sun.position.set(-118,86,-335);
 const metal=new T.MeshStandardMaterial({color:0x26394d,metalness:.77,roughness:.35});
