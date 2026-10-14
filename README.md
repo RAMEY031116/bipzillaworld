@@ -1,3 +1,27 @@
+## Standalone 3D museum development (without the Streamlit iframe)
+
+You can now work on the visitor-facing museum directly in **VS Code** with a Vite development server. This runs `index.html` as a full-page Three.js website; it does not run the Streamlit wrapper.
+
+```bash
+git clone https://github.com/RAMEY031116/bipzillaworld.git
+cd bipzillaworld
+npm install
+npm run dev
+```
+
+Open the local address printed by Vite (usually `http://localhost:5173`). The Three.js module import still uses a public CDN, so the first load requires internet. Standalone mode reads `artworks.json` and the existing `art/originals.json` fallback pack. The private artwork-publishing dashboard stays in Streamlit, with its existing GitHub credentials and secrets; do not expose those secrets in the standalone site.
+
+**Important:** This is a local development setup, not a completed production migration. The current public Streamlit URL continues to work. Hosting the standalone build publicly requires a separate deployment/static-asset pass, including handling artwork files in Vite's production output. Running locally removes the iframe but does not itself increase shader fidelity or device GPU capacity.
+
+### Realism pass — October 2026
+
+- A shared **PBR floor roughness and bump map** adds subtle panel seams, machining and wear without adding per-tile meshes. Marble reflectivity is more restrained and natural.
+- The observation wings now have instanced recessed exhibition fixtures, metallic fasteners, architectural wayfinding signs, and detailed orbital telemetry screens instead of flat coloured console rectangles.
+- Earth's atmosphere has a sun-aware blue limb and warmer terminator glow; the night-side city-light shader now uses the same directional sun vector as the scene. Existing satellite imagery, clouds, 3D gas giant, botanical planters, Nepal flags and original artworks remain intact.
+- The effects use shared textures and instanced geometry where possible; mobile still locks DETAIL scene content while using a reduced render pixel ratio.
+
+**Verification:** JavaScript syntax and manifest preservation checked. Browser rendering, device FPS, image-host availability and full Vite build/deployment have not been verified.
+
 ### Permanent DETAIL mode and space realism — October 2026
 
 The 3D viewer now starts and remains in **DETAIL** on both desktop and mobile: the quality selector is locked, the automatic frame-time resolution downgrade has been removed, and the device pixel ratio is capped at 1.5 for sharper rendering. This prioritizes image quality over frame rate; lower-powered phones may run less smoothly.
