@@ -1002,6 +1002,59 @@ for(const side of [-1,1]){
  const glowTrack=new T.Mesh(new T.BoxGeometry(.055,.06,62),neonStrip);
  glowTrack.position.set(side*20.18,.18,-22);observationShell.add(glowTrack)
 }
+// Practical exhibition lighting and museum wayfinding. Thin emissive
+// diffusers are backed by real 3D recessed housings; no extra shadow-casting
+// lights are created, keeping DETAIL mode usable on phones.
+const fixtureMetal=new T.MeshStandardMaterial({color:0x202e3b,metalness:.78,roughness:.4});
+const diffuser=new T.MeshBasicMaterial({color:0xffe4bd});
+const fixturePositions=[];
+for(const side of [-1,1])for(let z=-49;z<=6;z+=9){
+ fixturePositions.push([side*24.2,8.1,z]);
+}
+for(const side of [-1,1])for(let z=-50;z<=-20;z+=10){
+ fixturePositions.push([side*74,9.65,z])
+}
+const fixtureBase=new T.InstancedMesh(new T.BoxGeometry(2.1,.16,.46),fixtureMetal,fixturePositions.length);
+const fixtureLight=new T.InstancedMesh(new T.BoxGeometry(1.78,.035,.28),diffuser,fixturePositions.length);
+const fixtureDummy=new T.Object3D();
+fixturePositions.forEach(([x,y,z],i)=>{
+ fixtureDummy.position.set(x,y,z);fixtureDummy.rotation.set(0,0,0);
+ fixtureDummy.scale.set(1,1,1);fixtureDummy.updateMatrix();fixtureBase.setMatrixAt(i,fixtureDummy.matrix);
+ fixtureDummy.position.y=y-.095;fixtureDummy.updateMatrix();fixtureLight.setMatrixAt(i,fixtureDummy.matrix)
+});
+fixtureBase.instanceMatrix.needsUpdate=true;fixtureLight.instanceMatrix.needsUpdate=true;
+observationShell.add(fixtureBase,fixtureLight);
+// Rivets, seams and subtle mechanical fasteners on observation bay pillars.
+const boltGeometry=new T.CylinderGeometry(.075,.075,.04,8);
+const boltMaterial=new T.MeshStandardMaterial({color:0xa3b3bd,metalness:.9,roughness:.36});
+const boltPositions=[];
+for(const side of [-1,1])for(let z=-51;z<=-19;z+=8)
+ for(const offset of [-15,15])for(const y of [1.2,4.5,7.8])
+  boltPositions.push([side*74+offset,y,z+.39]);
+const bolts=new T.InstancedMesh(boltGeometry,boltMaterial,boltPositions.length);
+boltPositions.forEach(([x,y,z],i)=>{
+ fixtureDummy.position.set(x,y,z);fixtureDummy.rotation.set(Math.PI/2,0,0);
+ fixtureDummy.scale.set(1,1,1);fixtureDummy.updateMatrix();bolts.setMatrixAt(i,fixtureDummy.matrix)
+});
+bolts.instanceMatrix.needsUpdate=true;observationShell.add(bolts);
+function museumSign(text,subtext,x,y,z,rotation=0){
+ const c=document.createElement('canvas');c.width=1024;c.height=256;
+ const ctx=c.getContext('2d');
+ ctx.fillStyle='#0c1a29';ctx.fillRect(0,0,1024,256);
+ ctx.fillStyle='#c9a56c';ctx.fillRect(0,0,12,256);ctx.fillRect(0,0,1024,7);
+ ctx.fillStyle='#f3e8d3';ctx.font='700 68px system-ui,sans-serif';ctx.textAlign='center';
+ ctx.fillText(text,512,111,945);
+ ctx.fillStyle='#90b9c6';ctx.font='500 32px system-ui,sans-serif';ctx.fillText(subtext,512,180,945);
+ const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;
+ const g=new T.Group();g.position.set(x,y,z);g.rotation.y=rotation;observationShell.add(g);
+ box(g,0,0,-.055,7.4,1.95,.16,fixtureMetal);
+ const face=new T.Mesh(new T.PlaneGeometry(7.18,1.8),new T.MeshBasicMaterial({map:tex}));
+ face.position.z=.041;g.add(face)
+}
+// Overhead signs are placed near transitions, clear of the walking path.
+museumSign('EARTH OBSERVATION','ORBITAL ART · COLLECTION GALLERY',0,10.8,10,0);
+museumSign('NEBULA GALLERY','WEST WING · ART & SPACE',-74,8.3,-53,0);
+museumSign('PLANETARY OVERLOOK','DEEP SPACE · PANORAMA',0,9.2,-105,0);
 // Angular control consoles and display panels near the windows.
 function makeControlConsole(x,z,rotation){
  const g=new T.Group();g.position.set(x,0,z);g.rotation.y=rotation;
