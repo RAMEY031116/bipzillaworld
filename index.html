@@ -246,6 +246,9 @@ function brushedFrameTexture(){
  t.repeat.set(2,3);t.colorSpace=T.NoColorSpace;
  return t
 }
+// Soft exhibit lighting is baked into the frame face rather than creating
+// 52 real-time lights (which would slow mobile rendering dramatically).
+const artWallGlow=new T.MeshBasicMaterial({color:0x2c5265,transparent:true,opacity:.11,depthWrite:false});
 const brushedMetalTexture=brushedFrameTexture();
 exhibitionMaterial.rim.bumpMap=brushedMetalTexture;
 exhibitionMaterial.rim.bumpScale=.032;
@@ -273,6 +276,8 @@ function galleryBoard(x,z,angle){
  box(g,0,2.85,.40,4.13,4.58,.045,rim);
  box(g,0,2.85,.375,4.07,4.52,.045,back);
  box(g,0,5.58,.24,4.65,.12,.3,ledWarm);
+ const glowPanel=new T.Mesh(new T.PlaneGeometry(4.5,5.05),artWallGlow);
+ glowPanel.position.set(0,2.85,.419);g.add(glowPanel);
  // Reusable label texture, updated when the visitor changes exhibition pages.
  const labelCanvas=document.createElement('canvas');
  labelCanvas.width=512;labelCanvas.height=128;
@@ -324,7 +329,7 @@ function updateFrame(frame,index){
    // Preserve full originals for the click-to-view modal, but cap the
    // texture uploaded to the GPU for the walkable museum display.
    const source=tx.image,sw=source?.width||1,sh=source?.height||1;
-   const limit=isMobileDevice?1024:1536;
+   const limit=isMobileDevice?768:1536;
    if(Math.max(sw,sh)>limit){
     const ratio=limit/Math.max(sw,sh),canvas=document.createElement('canvas');
     canvas.width=Math.max(1,Math.round(sw*ratio));canvas.height=Math.max(1,Math.round(sh*ratio));
@@ -1977,7 +1982,7 @@ const qualityManuallySelected=true;
 let slowFrames=0,fastFrames=0;
 function applyQuality(){
  qualityIndex=2;
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,isMobileDevice?1.25:1.5));
  renderer.setSize(innerWidth,innerHeight,false);
  starUniforms.uPixelRatio.value=renderer.getPixelRatio();
  debris.visible=false;
@@ -2013,10 +2018,10 @@ function render(now){
  const elapsed=now*.001;
  // Load artwork textures only when a visitor approaches their gallery bay.
  // Hundreds of future uploads never decode into GPU memory all at once.
- if(!render.lastGalleryCheck||now-render.lastGalleryCheck>650){
+ if(!render.lastGalleryCheck||now-render.lastGalleryCheck>(isMobileDevice?1100:650)){
   render.lastGalleryCheck=now;
   for(const frame of galleryFrames){
-   if(frame.g.visible&&!frame.imageQueued&&frame.g.position.distanceToSquared(camera.position)<2704)frame.loadImage?.()
+   if(frame.g.visible&&!frame.imageQueued&&frame.g.position.distanceToSquared(camera.position)<(isMobileDevice?1450:2704))frame.loadImage?.()
   }
  }
  if(focusTransition){const f=focusTransition,t=Math.min(1,(now-f.start)/f.duration),e=t*t*(3-2*t);camera.position.lerpVectors(f.from,f.to,e);yaw=f.yawStart+f.yawDelta*e;pitch=f.pitchStart+(f.pitchEnd-f.pitchStart)*e;camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;if(t>=1){focusTransition=null;showArtwork(f.index)}}
