@@ -1,0 +1,19 @@
+{
+  "name": "bipzillaworld",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Standalone Three.js development server for the orbital art museum",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "start": "vite --host 0.0.0.0"
+  },
+  "dependencies": {
+    "three": "0.165.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
