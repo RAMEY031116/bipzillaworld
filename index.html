@@ -724,8 +724,8 @@ function marbleTexture(){
  tx.wrapS=tx.wrapT=T.RepeatWrapping;tx.repeat.set(3,3);tx.anisotropy=4;return tx
 }
 const marble=new T.MeshPhysicalMaterial({
- map:marbleTexture(),color:0xe3eaf3,metalness:.23,roughness:.14,
- clearcoat:.9,clearcoatRoughness:.12
+ map:marbleTexture(),color:0xe3eaf3,metalness:.12,roughness:.26,
+ clearcoat:.66,clearcoatRoughness:.18
 });
 const brass=new T.MeshStandardMaterial({color:0xb99464,metalness:.94,roughness:.19});
 const velvet=new T.MeshStandardMaterial({color:0x102331,metalness:.08,roughness:.85});
@@ -970,8 +970,28 @@ function floorGridTexture(){
  t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(7,9);t.anisotropy=2;
  return t
 }
+// Physically varied floor finish: the roughness/bump mask adds subtle
+// machining, wear along tile seams, fine scuffs and irregular reflections.
+// It is generated once, shared by every floor tile and costs no extra meshes.
+function floorSurfaceDetail(){
+ const c=document.createElement('canvas');c.width=512;c.height=512;
+ const ctx=c.getContext('2d'),im=ctx.createImageData(512,512);
+ let seed=197604;const rand=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296};
+ for(let y=0;y<512;y++)for(let x=0;x<512;x++){
+  const edge=Math.min(x%64,64-x%64,y%64,64-y%64);
+  const scuff=Math.sin(x*.19+y*.031)*5+Math.sin(x*.67-y*.12)*3;
+  const noise=(rand()-.5)*26;
+  const value=Math.max(32,Math.min(235,132+scuff+noise+(edge<4?-42:0)));
+  const i=(y*512+x)*4;im.data[i]=im.data[i+1]=im.data[i+2]=value;im.data[i+3]=255
+ }
+ ctx.putImageData(im,0,0);
+ const t=new T.CanvasTexture(c);t.colorSpace=T.NoColorSpace;
+ t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(7,9);
+ t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return t
+}
+const floorDetailMap=floorSurfaceDetail();
 const griddedFloor=new T.MeshStandardMaterial({
- map:floorGridTexture(),metalness:.36,roughness:.28,color:0xb6c5d1
+ map:floorGridTexture(),roughnessMap:floorDetailMap,bumpMap:floorDetailMap,bumpScale:.045,metalness:.36,roughness:.49,color:0xb6c5d1
 });
 const floorInset=new T.Mesh(new T.PlaneGeometry(56,63),griddedFloor);
 floorInset.rotation.x=-Math.PI/2;floorInset.position.set(0,.092,-22);
