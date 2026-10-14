@@ -1055,14 +1055,40 @@ function museumSign(text,subtext,x,y,z,rotation=0){
 museumSign('EARTH OBSERVATION','ORBITAL ART · COLLECTION GALLERY',0,10.8,10,0);
 museumSign('NEBULA GALLERY','WEST WING · ART & SPACE',-74,8.3,-53,0);
 museumSign('PLANETARY OVERLOOK','DEEP SPACE · PANORAMA',0,9.2,-105,0);
+// Shared high-resolution instrument display: crisp orbital tracks, system
+// telemetry and tiny typography instead of an untextured cyan rectangle.
+function consoleScreenTexture(){
+ const c=document.createElement('canvas');c.width=1024;c.height=512;
+ const ctx=c.getContext('2d');
+ const bg=ctx.createLinearGradient(0,0,0,512);
+ bg.addColorStop(0,'#142b38');bg.addColorStop(1,'#06121d');
+ ctx.fillStyle=bg;ctx.fillRect(0,0,1024,512);
+ ctx.strokeStyle='rgba(99,174,193,.15)';ctx.lineWidth=1;
+ for(let x=0;x<1024;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,512);ctx.stroke()}
+ for(let y=0;y<512;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(1024,y);ctx.stroke()}
+ ctx.strokeStyle='#80d5d9';ctx.lineWidth=4;
+ ctx.beginPath();ctx.ellipse(340,270,260,112,-.31,0,Math.PI*2);ctx.stroke();
+ ctx.strokeStyle='#dfbc86';ctx.lineWidth=2;
+ ctx.beginPath();ctx.ellipse(340,270,193,192,.31,0,Math.PI*2);ctx.stroke();
+ ctx.fillStyle='#69b9db';ctx.beginPath();ctx.arc(340,270,76,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#0c344b';ctx.beginPath();ctx.arc(320,250,65,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#e8c78b';ctx.beginPath();ctx.arc(530,181,9,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#b9f4ee';ctx.font='bold 31px monospace';ctx.fillText('BIPZILLA / ORBITAL',620,72);
+ ctx.font='21px monospace';ctx.fillStyle='#9fc4cf';
+ ['STATION  : NOMINAL','EARTH    : TRACKING','GALLERY  : ONLINE',
+  'EXHIBIT  : ACTIVE','UPLINK   : SECURE'].forEach((line,i)=>ctx.fillText(line,620,139+i*65));
+ ctx.fillStyle='#d9b77f';ctx.fillRect(618,459,350,3);
+ const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;
+ tx.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return tx
+}
+const consoleDisplayMaterial=new T.MeshBasicMaterial({map:consoleScreenTexture(),toneMapped:false});
 // Angular control consoles and display panels near the windows.
 function makeControlConsole(x,z,rotation){
  const g=new T.Group();g.position.set(x,0,z);g.rotation.y=rotation;
  observationShell.add(g);
  box(g,0,.85,0,3.3,1.7,1.3,darkPanelMetal);
  box(g,0,1.69,-.18,3.2,.12,1.1,brass);
- const screen=new T.Mesh(new T.PlaneGeometry(2.85,.76),
-  new T.MeshBasicMaterial({color:0x4c9db5}));
+ const screen=new T.Mesh(new T.PlaneGeometry(2.85,.76),consoleDisplayMaterial);
  screen.position.set(0,1.8,-.2);screen.rotation.x=-Math.PI*.24;g.add(screen);
  for(let i=0;i<7;i++)box(g,-1.1+i*.35,1.91,-.15,.2,.015,.1,neonStrip)
 }
